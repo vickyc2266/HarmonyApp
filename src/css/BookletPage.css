@@ -1,0 +1,32 @@
+@font-face {
+  font-family: 'georgia';
+  src: url(/fonts/georgia.woff2) format("woff2")
+}
+@font-face {
+  font-family: 'georgia-bold';
+  src: url(/fonts/georgiab.woff2) format("woff2")
+}
+.questionnaire {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .question {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateX(100%);
+    transition: transform 0.5s ease-in-out;
+  }
+  
+  .question.current {
+    transform: translateX(0%);
+  }
+  
+  .question.previous {
+    transform: translateX(-100%);
+  }
