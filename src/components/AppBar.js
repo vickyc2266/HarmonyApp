@@ -1,32 +1,36 @@
 import * as React from 'react';
-import { AppBar, Box, Button, Toolbar, Typography, Avatar, Tooltip, MenuItem, Menu, Container } from '@mui/material';
+import { AppBar, Box, Select, Toolbar, Typography, Avatar, Tooltip, MenuItem, Menu, Container, Divider } from '@mui/material';
 import { Settings, ManageAccounts, Language, Logout, Menu as MenuIcon, Person as PersonIcon, JoinInner } from '@mui/icons-material/';
 import { useAuth } from "../contexts/AuthContext"
 import { useTheme } from '@mui/material/styles'
-
-
-const settings = ['My harmonizations', 'Language', 'Logout'];
+import { useHistory } from "react-router-dom"
+import logoWithText from '../img/Logo-04-min.svg'
+import pattern from '../img/pattern.svg'
+import GoogleIcon from '@mui/icons-material/Google'
+import GitHubIcon from '@mui/icons-material/GitHub';
+import Login from './Login';
+const settings = ['My harmonizations', 'Logout'];
+const languages = [
+  { code: 'EN', label: 'English' },
+  { code: 'PT', label: 'Portuguese' }
+];
 const SettingsIcons = {
-  'My harmonizations' : <JoinInner/>,
-  'Language': <Language />,
+  'My harmonizations': <JoinInner />,
   'Logout': <Logout />
 }
-function UniAppBar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const { currentUser, logout,  resetPassword, updateEmail, updatePassword } = useAuth();
+function HarmonyAppBar() {
+  const [anchorUser, setAnchorUser] = React.useState(null);
+  const [anchorLanguage, setAnchorLanguage] = React.useState(null);
   const theme = useTheme();
+  const { currentUser, logout, signInWithGoogle } = useAuth();
+  const history = useHistory()
 
-  console.log(currentUser);
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
+    setAnchorUser(event.currentTarget);
   };
 
-  const handleMenuItemClick = (menuItem) => {
-    switch (menuItem){
+  const handleUserMenuClick = (menuItem) => {
+    switch (menuItem) {
       case 'Logout':
         handleCloseUserMenu();
         console.log('logging out');
@@ -35,46 +39,50 @@ function UniAppBar() {
     }
   };
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+  const handleLanguageMenuClick = (menuItem) => {
+    console.log(menuItem)
   };
 
+
+
   const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+    setAnchorUser(null);
   };
 
   return (
-    <AppBar  position="fixed"  style={{ background: 'transparent', boxShadow: 'none'}}>
-      <Container maxWidth="xl">
+    <AppBar position="absolute"
+      sx={{
+        background: 'transparent', boxShadow: 'none', top: 0
+      }}>
+      <Container sx={{maxWidth:"100%!important"}}>
         <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <Avatar
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </Avatar>
-        
-          </Box>
 
-<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            
-          </Box>
-<Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-                <Avatar onClick={handleOpenUserMenu} sx={{ display: 'flex' }}>
-                  {currentUser && currentUser.photoURL && <img style={{width:"100%", height:"100%"}} src={currentUser.photoURL}/> }
-                  {currentUser && !currentUser.photoURL && currentUser.email.substring(1).toUpperCase() }
-                </Avatar>
+          <Box sx={{ flexGrow: 1 }}></Box>
+
+          <Select
+            size="small"
+            id="language"
+            value={"EN"}
+            onChange={handleLanguageMenuClick}
+            sx={{ mr:2 }}
+          >
+            <MenuItem value={"EN"}>English</MenuItem>
+            <MenuItem value={"PT"}>Portuguese</MenuItem>
+          </Select>
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="My Harmony">
+              <Avatar
+                src={currentUser && currentUser.photoURL}
+                imgProps={{ referrerPolicy: "no-referrer" }}
+                onClick={handleOpenUserMenu}
+                sx={{ display: 'flex' }}>
+                {currentUser && !currentUser.photoURL && currentUser.email.substring(1).toUpperCase()}
+              </Avatar>
             </Tooltip>
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
-              anchorEl={anchorElUser}
+              anchorEl={anchorUser}
               anchorOrigin={{
                 vertical: 'top',
                 horizontal: 'right',
@@ -83,21 +91,30 @@ function UniAppBar() {
                 vertical: 'top',
                 horizontal: 'right',
               }}
-              open={Boolean(anchorElUser)}
+              open={Boolean(anchorUser)}
               onClose={handleCloseUserMenu}
-            >
+            > 
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={()=>handleMenuItemClick(setting)}>
-                  { SettingsIcons[setting] }
-                  <Typography textAlign="center" sx={{pl:1}}>{setting}</Typography>
+                <MenuItem key={setting} onClick={() => handleUserMenuClick(setting)} disabled={!currentUser}>
+                  {SettingsIcons[setting]}
+                  <Typography textAlign="center" sx={{ pl: 1 }}>{setting}</Typography>
                 </MenuItem>
               ))}
-            </Menu>
+              {!currentUser && <Divider/>}
+              {!currentUser && <MenuItem key="SSOGoogle" onClick={() => signInWithGoogle().then(handleCloseUserMenu)}>
+                  <GoogleIcon />
+                  <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with Google</Typography>
+                </MenuItem>}
+                {!currentUser && <MenuItem key="SSOGithub" disabled={true} onClick={() => signInWithGoogle().then(handleCloseUserMenu)}>
+                  <GitHubIcon />
+                  <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with GitHub</Typography>
+                </MenuItem>}
+                </Menu>
           </Box>
-        
+
         </Toolbar>
       </Container>
     </AppBar>
   );
 }
-export default UniAppBar;
+export default HarmonyAppBar;

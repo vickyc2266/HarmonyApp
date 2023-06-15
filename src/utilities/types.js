@@ -1,9 +1,11 @@
 
-function Question(text, num="", intro="",  instrument = null) {
-    this.text = text;
+function Question(question_index, question_text, question_no="", question_intro="", options=[], instrument = null) {
+    this.index = question_index
+    this.text = question_text;
     this.instrument = instrument;
-    this.num = num;
-    this.intro = intro;
+    this.no = question_no;
+    this.intro = question_intro;
+    this.options = options;
     this.setInstrument = (instrument) => {
         this.instrument = instrument;
         this.instrument.addQuestion(this);

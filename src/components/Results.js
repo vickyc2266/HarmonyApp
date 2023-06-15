@@ -1,32 +1,50 @@
-import React, { useState} from "react"
-import { useAuth } from "../contexts/AuthContext"
+import React, { useEffect, useState } from "react"
 import { Question, Instrument } from "../utilities/types"
-import TwoWay from "./twoWay";
-import gadEnPt from "../utilities/testPosts"
-import postData from "../utilities/postData";
+import { Paper } from '@mui/material'
+import MatchUnit from "./matchUnit";
+//import gadEnPt from "../utilities/testPosts"
 
 
-export default function Results(results) {
-  const inst = new Instrument("GAD7", "en", "gadID")
-  const q1 = new Question ("Gad question 1", "GAD01")
-  const q2 = new Question ("Gad question 2", "GAD02")
-  const [apiData, updateApiData] = useState({results});
-  q1.setInstrument(inst)
-  q2.setInstrument(inst)
-  postData('https://api.harmonydata.org/text/match', gadEnPt).then((data) =>{
-    //updateApiData(data);
-    console.log(data);
-  })
 
+export default function Results({ fileInfos, apiData }) {
+  const [instruments, setInstruments] = useState([])
+  const [questions, setQuestions] = useState([])
+  const currentThreshold = 0.7;
 
-  
+  useEffect(() => {
+    if (fileInfos && fileInfos.length) {
+      let instruments = [];
+      let questions = [];
+      fileInfos.map((i) => {
+        let instrument = new Instrument(i.instrument_name, i.language, i.instrument_id,);
+        i.questions.map((q, index) => {
+          let question = new Question(index, q.question_text, q.question_no, q.question_intro, q.options);
+          question.setInstrument(instrument);
+          questions.push(question);
+        });
+        instruments.push(instrument);
+      });
+      setInstruments(instruments);
+      setQuestions(questions);
+    }
+  }, [fileInfos, apiData]);
+
 
   return (
-    <>
-    <TwoWay Q1={q1} Q2={q2} percentage={20}></TwoWay>
-    <TwoWay Q1={q1} Q2={q2} percentage={60}></TwoWay>
-    <TwoWay Q1={q1} Q2={q2} percentage={80}></TwoWay>
-    <TwoWay Q1={q1} Q2={q2} percentage={95}></TwoWay>
-    </>
+    <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
+      {/* This assumes the instrument order is the same as the match order */}
+      {apiData && questions.length && apiData.matches && apiData.matches.map((matches, qi) => {
+        let twoWays = [];
+        // extract the indexes of questions over current thrshold
+        matches.reduce(function (a, e, i) {
+          if (Math.abs(e) > currentThreshold)
+            a.push({ mqi: i, match: e });
+          return a;
+        }, []).map((i) => {
+          if (i.mqi > qi) twoWays.push(<MatchUnit Q1={questions[qi]} Q2={questions[i.mqi]} percentage={Math.round(i.match * 100)} />)
+        });
+        return twoWays;
+      })}
+    </Paper>
   )
 }

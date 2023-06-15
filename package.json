@@ -1,5 +1,5 @@
 {
-  "name": "univenture",
+  "name": "harmony",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -19,6 +19,7 @@
     "react-drag-drop-files": "^2.3.10",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.1",
+    "react-transition-group": "^4.4.5",
     "typeface-montserrat": "^1.1.13"
   },
   "scripts": {
@@ -49,7 +50,7 @@
     "url": "git+https://github.com/ronnyTodgers/uniVenture.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ronnyTodgers/uniVenture/issues"
   },
