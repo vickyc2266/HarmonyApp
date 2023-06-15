@@ -17,7 +17,7 @@ function Instrument(name, language="en", id = "",  questions = []) {
     this.id = id;
     this.questions = questions;
     this.addQuestion = (question) =>{
-        if(this.questions.indexOf(question) ==-1) {
+        if(this.questions.indexOf(question) === -1) {
             this.questions.push(question);
         }
     }

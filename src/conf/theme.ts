@@ -1,4 +1,4 @@
-import { ThemeOptions, withTheme } from "@mui/material/styles";
+import { ThemeOptions } from "@mui/material/styles";
 import "../css/Pragmatica.css";
 
 export const themeOptions: ThemeOptions = {

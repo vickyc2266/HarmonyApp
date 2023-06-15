@@ -1,6 +1,5 @@
 import React, { useState } from "react"
-import { Container, Paper, Box, Slide } from "@mui/material"
-import { TransitionGroup } from "react-transition-group";
+import { Container,  Box, Slide } from "@mui/material"
 import { AuthProvider } from "../contexts/AuthContext"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Upload from "./Upload"
@@ -49,7 +48,6 @@ function App() {
                 marginRight: "auto",
                 height: { md: '100%', sm: 'unset' },
                 background: 'linear-gradient(-135deg,#0de5b2, #2b45ed)',
-                backgroundImage: `url(${pattern})`,
                 backgroundImage: `linear-gradient(-135deg,#0de5b2DD, #2b45edAA), url(${pattern}), linear-gradient(-135deg,#0de5b2, #2b45ed)`,
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
@@ -60,7 +58,7 @@ function App() {
               }}
             >
 
-              <img src={logoWithText} />
+              <img src={logoWithText} alt="Harmony Logo" />
               <Switch>
                   <Route path="/model/:stateHash?">
                     <ResultsOptions resultsOptions = {resultsOptions} setResultsOptions = {setResultsOptions} />
@@ -74,7 +72,7 @@ function App() {
                 </Switch>
               
               <Box sx={{ display: { md: 'block', sm: 'none', xs: 'none' } }} >
-                <img src={logoWithText} style={{ visibility: "hidden" }} />
+                <img src={logoWithText} style={{ visibility: "hidden" }} alt="Harmony Logo" />
               </Box>
             </Box>
             <HarmonyAppBar></HarmonyAppBar>

@@ -12,7 +12,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
   const history = useHistory()
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
-    files.map(file => {
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onload = (event) => {
         postData("https://api.harmonydata.org/text/parse",
@@ -36,7 +36,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
 
   const removeInstrument = (instrument_id) => {
     const newFileInfos = fileInfos.filter((fileInfo) => {
-      return fileInfo.instrument_id != instrument_id;
+      return fileInfo.instrument_id !== instrument_id;
     })
     setFileInfos(newFileInfos)
   }
@@ -44,7 +44,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
   const removeQuestion = (instrument_id, question_index) => {
 
     const newFileInfos = fileInfos.filter((fileInfo) => {
-      return fileInfo.instrument_id != instrument_id || fileInfo.questions.splice(question_index, 1);
+      return fileInfo.instrument_id !== instrument_id || fileInfo.questions.splice(question_index, 1);
     })
     setFileInfos(newFileInfos)
   }
@@ -103,7 +103,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
       <Button
         variant="contained"
         sx={{ margin: "2rem" }}
-        disabled={fileInfos.length == 0 || loading}
+        disabled={fileInfos.length === 0 || loading}
         onClick={
           () => {
             setLoading(true);

@@ -7,32 +7,28 @@ import MatchUnit from "./matchUnit";
 
 
 export default function Results({ fileInfos, apiData, resultsOptions }) {
-  const [instruments, setInstruments] = useState([])
   const [questions, setQuestions] = useState([])
   
 
 
   useEffect(() => {
     if (fileInfos && fileInfos.length) {
-      let instruments = [];
       let questions = [];
-      fileInfos.map((i) => {
+      fileInfos.forEach((i) => {
         let instrument = new Instrument(i.instrument_name, i.language, i.instrument_id,);
-        i.questions.map((q, index) => {
+        i.questions.forEach((q, index) => {
           let question = new Question(index, q.question_text, q.question_no, q.question_intro, q.options);
           question.setInstrument(instrument);
           questions.push(question);
         });
-        instruments.push(instrument);
-      });
-      setInstruments(instruments);
+      })
       setQuestions(questions);
     }
   }, [fileInfos, apiData, resultsOptions]);
 
 
   return (
-    <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
+    <Paper elevation={2} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
       {/* This assumes the instrument order is the same as the match order */}
       {apiData && questions.length && apiData.matches && apiData.matches.map((matches, qi) => {
         let twoWays = [];
@@ -41,8 +37,8 @@ export default function Results({ fileInfos, apiData, resultsOptions }) {
           if (Math.abs(e) > (resultsOptions.threshold/100))
             a.push({ mqi: i, match: e });
           return a;
-        }, []).map((i) => {
-          if (i.mqi > qi) twoWays.push(<MatchUnit Q1={questions[qi]} Q2={questions[i.mqi]} percentage={Math.round(i.match * 100)} />)
+        }, []).forEach((i) => {
+          if (i.mqi > qi) twoWays.push(<MatchUnit key={i.mqi + '-' + i.match +'-' + qi } Q1={questions[qi]} Q2={questions[i.mqi]} percentage={Math.round(i.match * 100)} />)
         });
         return twoWays;
       })}

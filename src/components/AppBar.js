@@ -1,29 +1,19 @@
 import * as React from 'react';
 import { AppBar, Box, Select, Toolbar, Typography, Avatar, Tooltip, MenuItem, Menu, Container, Divider } from '@mui/material';
-import { Settings, ManageAccounts, Language, Logout, Menu as MenuIcon, Person as PersonIcon, JoinInner } from '@mui/icons-material/';
+import { Logout, JoinInner } from '@mui/icons-material/';
 import { useAuth } from "../contexts/AuthContext"
-import { useTheme } from '@mui/material/styles'
-import { useHistory } from "react-router-dom"
-import logoWithText from '../img/Logo-04-min.svg'
-import pattern from '../img/pattern.svg'
+
 import GoogleIcon from '@mui/icons-material/Google'
 import GitHubIcon from '@mui/icons-material/GitHub';
-import Login from './Login';
 const settings = ['My harmonizations', 'Logout'];
-const languages = [
-  { code: 'EN', label: 'English' },
-  { code: 'PT', label: 'Portuguese' }
-];
+
 const SettingsIcons = {
   'My harmonizations': <JoinInner />,
   'Logout': <Logout />
 }
 function HarmonyAppBar() {
   const [anchorUser, setAnchorUser] = React.useState(null);
-  const [anchorLanguage, setAnchorLanguage] = React.useState(null);
-  const theme = useTheme();
   const { currentUser, logout, signInWithGoogle } = useAuth();
-  const history = useHistory()
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -36,6 +26,8 @@ function HarmonyAppBar() {
         console.log('logging out');
         logout();
         break;
+      default:
+        
     }
   };
 

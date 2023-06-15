@@ -20,7 +20,8 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.1",
     "react-transition-group": "^4.4.5",
-    "typeface-montserrat": "^1.1.13"
+    "typeface-montserrat": "^1.1.13",
+    "nth-check": ">=2.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -47,12 +48,12 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ronnyTodgers/uniVenture.git"
+    "url": "git+https://github.com/harmonydata/harmonydata.github.io.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ronnyTodgers/uniVenture/issues"
+    "url": "https://github.com/harmonydata/harmonydata.github.io/issues"
   },
-  "homepage": "http://localhost"
+  "homepage": "https://harmonydata.github.io/"
 }

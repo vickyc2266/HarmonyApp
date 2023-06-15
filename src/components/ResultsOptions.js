@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { Question, Instrument } from "../utilities/types"
-import { Paper, Slider, Switch, FormGroup, Typography, Stack, ListItem} from '@mui/material'
-import MatchUnit from "./matchUnit";
-//import gadEnPt from "../utilities/testPosts"
-
+import React, {  useState } from "react"
+import { Paper, Slider, Switch,  Typography, Stack} from '@mui/material'
 
 
 export default function ResultsOptions({ resultsOptions, setResultsOptions }) {
@@ -23,7 +19,8 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions }) {
         Match Threshold 
       </Typography></div>
         <Slider 
-        value={threshold} 
+        value={threshold}
+        min={30} 
         valueLabelDisplay="auto" 
         onChange={(e, value) => {setThreshold(value)}}
         onChangeCommitted={(e, value) => {let thisOptions = {...resultsOptions}; thisOptions.threshold = isNaN(value)?70:value; setResultsOptions(thisOptions)}}
