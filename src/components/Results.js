@@ -6,10 +6,11 @@ import MatchUnit from "./matchUnit";
 
 
 
-export default function Results({ fileInfos, apiData }) {
+export default function Results({ fileInfos, apiData, resultsOptions }) {
   const [instruments, setInstruments] = useState([])
   const [questions, setQuestions] = useState([])
-  const currentThreshold = 0.7;
+  
+
 
   useEffect(() => {
     if (fileInfos && fileInfos.length) {
@@ -27,7 +28,7 @@ export default function Results({ fileInfos, apiData }) {
       setInstruments(instruments);
       setQuestions(questions);
     }
-  }, [fileInfos, apiData]);
+  }, [fileInfos, apiData, resultsOptions]);
 
 
   return (
@@ -37,7 +38,7 @@ export default function Results({ fileInfos, apiData }) {
         let twoWays = [];
         // extract the indexes of questions over current thrshold
         matches.reduce(function (a, e, i) {
-          if (Math.abs(e) > currentThreshold)
+          if (Math.abs(e) > (resultsOptions.threshold/100))
             a.push({ mqi: i, match: e });
           return a;
         }, []).map((i) => {

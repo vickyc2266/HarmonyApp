@@ -6,6 +6,7 @@ export const themeOptions: ThemeOptions = {
     body1: {
       fontFamily: "Pragmatica, sans-serif",
        fontWeight: 300,
+       color: "#0de5b2",
        lineHeight: "1.3"
     },
     caption: {
@@ -20,15 +21,16 @@ export const themeOptions: ThemeOptions = {
     borderRadius: 10,
   },
   palette: {
-    mode: "light",
+    mode: "dark",
     primary: {
       main: "#0de5b2",
     },
     secondary: {
       main: "#2b45ed",
     },
-    background: {
-      paper: "#fefcfb",
+     background: {
+      default: "#131854",
+      paper: "#131854",
     },
   },
   components: {
@@ -38,12 +40,12 @@ export const themeOptions: ThemeOptions = {
           fontFamily: "Pragmatica, sans-serif",
           fontWeight: 300,
           lineHeight: "1.3",
-          //color: "black",
+          color: "#0de5b2",
           "& h1, h2, h3, h4, h5, h6": {
             fontFamily: "Montserrat, sans-serif",
-            fontWeight: 600,
+            fontWeight: 400,
             lineHeight: "1.2",
-            //color: "black"
+            color: "#0de5b2"
           },
         },
       },

@@ -19,7 +19,7 @@ const theme = createTheme(themeOptions);
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
   const [apiData, setApiData] = useState({});
-  const [resultsOptions, setResultsOptions] = useState({});
+  const [resultsOptions, setResultsOptions] = useState({threshold:70, intraInstrument:true});
  
   return (
     <ThemeProvider theme={theme}>
@@ -83,7 +83,7 @@ function App() {
               direction="up"
 
             >
-              <Box sx={{ width: { md: '50%', sm: '100%' },maxHeight: {md: "100%"}, overflow: "auto", padding: useMediaQuery(theme.breakpoints.only('xs')) ? "1rem" : "2rem" }}>
+              <Box sx={{ width: { md: '50%', sm: '100%' },maxHeight: {md: "100%"}, paddingTop:{md: "4rem"},  overflow: "auto", padding: useMediaQuery(theme.breakpoints.only('xs')) ? "1rem" : "2rem" }}>
                 <Switch>
                   {/* <Route path="/signup" component={Signup} /> */}
                   {/* <Route path="/forgot-password" component={ForgotPassword} /> */}
@@ -91,7 +91,7 @@ function App() {
                     <Login />
                   </Route>
                   <Route path="/model/:stateHash?">
-                    <Results fileInfos={fileInfos} apiData={apiData} />
+                    <Results fileInfos={fileInfos} apiData={apiData} resultsOptions = {resultsOptions} />
                   </Route>
                   <Route path="*" >
                     <Upload fileInfos={fileInfos} setFileInfos={setFileInfos} setApiData={setApiData} />
