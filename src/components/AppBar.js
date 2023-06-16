@@ -2,7 +2,7 @@ import * as React from 'react';
 import { AppBar, Box, Select, Toolbar, Typography, Avatar, Tooltip, MenuItem, Menu, Container, Divider } from '@mui/material';
 import { Logout, JoinInner } from '@mui/icons-material/';
 import { useAuth } from "../contexts/AuthContext"
-
+import ThemeToggle from './ThemeToggle';
 import GoogleIcon from '@mui/icons-material/Google'
 import GitHubIcon from '@mui/icons-material/GitHub';
 const settings = ['My harmonizations', 'Logout'];
@@ -27,7 +27,7 @@ function HarmonyAppBar() {
         logout();
         break;
       default:
-        
+
     }
   };
 
@@ -46,21 +46,11 @@ function HarmonyAppBar() {
       sx={{
         background: 'transparent', boxShadow: 'none', top: 0
       }}>
-      <Container sx={{maxWidth:"100%!important"}}>
+      <Container sx={{ maxWidth: "100%!important" }}>
         <Toolbar disableGutters>
 
           <Box sx={{ flexGrow: 1 }}></Box>
 
-          <Select
-            size="small"
-            id="language"
-            value={"EN"}
-            onChange={handleLanguageMenuClick}
-            sx={{ mr:2 }}
-          >
-            <MenuItem value={"EN"}>English</MenuItem>
-            <MenuItem value={"PT"}>Portuguese</MenuItem>
-          </Select>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="My Harmony">
               <Avatar
@@ -72,7 +62,7 @@ function HarmonyAppBar() {
               </Avatar>
             </Tooltip>
             <Menu
-              sx={{ mt: '45px' }}
+              sx={{ mt: '45px'}}
               id="menu-appbar"
               anchorEl={anchorUser}
               anchorOrigin={{
@@ -85,23 +75,38 @@ function HarmonyAppBar() {
               }}
               open={Boolean(anchorUser)}
               onClose={handleCloseUserMenu}
-            > 
+            >
+              <MenuItem key="mode" ><ThemeToggle /></MenuItem>
+              <MenuItem key="language" >
+                <Select
+                  size="small" 
+                  id="language"
+                  value={"EN"}
+                  onChange={handleLanguageMenuClick}
+                  sx={{  width:"100%"  }}
+                >
+                  <MenuItem value={"EN"}>English</MenuItem>
+                  <MenuItem value={"PT"}>Portuguese</MenuItem>
+                </Select>
+              </MenuItem>
+              <Divider />
+
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={() => handleUserMenuClick(setting)} disabled={!currentUser}>
                   {SettingsIcons[setting]}
                   <Typography textAlign="center" sx={{ pl: 1 }}>{setting}</Typography>
                 </MenuItem>
               ))}
-              {!currentUser && <Divider/>}
+              {!currentUser && <Divider />}
               {!currentUser && <MenuItem key="SSOGoogle" onClick={() => signInWithGoogle().then(handleCloseUserMenu)}>
-                  <GoogleIcon />
-                  <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with Google</Typography>
-                </MenuItem>}
-                {!currentUser && <MenuItem key="SSOGithub" disabled={true} onClick={() => signInWithGoogle().then(handleCloseUserMenu)}>
-                  <GitHubIcon />
-                  <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with GitHub</Typography>
-                </MenuItem>}
-                </Menu>
+                <GoogleIcon />
+                <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with Google</Typography>
+              </MenuItem>}
+              {!currentUser && <MenuItem key="SSOGithub" disabled={true} onClick={() => signInWithGoogle().then(handleCloseUserMenu)}>
+                <GitHubIcon />
+                <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with GitHub</Typography>
+              </MenuItem>}
+            </Menu>
           </Box>
 
         </Toolbar>

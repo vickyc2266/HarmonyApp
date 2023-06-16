@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Question, Instrument } from "../utilities/types"
 import { Paper } from '@mui/material'
-import MatchUnit from "./matchUnit";
+import MatchUnit from "./MatchUnit";
 //import gadEnPt from "../utilities/testPosts"
 
 
@@ -28,7 +28,7 @@ export default function Results({ fileInfos, apiData, resultsOptions }) {
 
 
   return (
-    <Paper elevation={2} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
+    <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
       {/* This assumes the instrument order is the same as the match order */}
       {apiData && questions.length && apiData.matches && apiData.matches.map((matches, qi) => {
         let twoWays = [];

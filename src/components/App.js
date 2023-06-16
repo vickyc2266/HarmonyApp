@@ -1,26 +1,49 @@
-import React, { useState } from "react"
-import { Container,  Box, Slide } from "@mui/material"
+import React, { useState, useEffect, useMemo } from "react"
+import { Container,  Box, Slide, useMediaQuery } from "@mui/material"
 import { AuthProvider } from "../contexts/AuthContext"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Upload from "./Upload"
 import Results from "./Results"
 import Login from "./Login"
 import CssBaseline from '@mui/material/CssBaseline';
-import { themeOptions } from '../conf/theme.ts'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { getDesignTokens, getThemedComponents } from '../conf/theme.ts'
+import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/styles'
 import HarmonyAppBar from './AppBar'
-import useMediaQuery from '@mui/material/useMediaQuery';
 import pattern from '../img/pattern.svg'
 import logoWithText from '../img/Logo-04-min.svg'
 import ResultsOptions from "./ResultsOptions";
-const theme = createTheme(themeOptions);
+import { deepmerge } from '@mui/utils';
+import { ColorModeContext } from "../contexts/ColorModeContext"
 
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({threshold:70, intraInstrument:true});
- 
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [mode, setMode] = useState();
+
+  useEffect(() => {
+    setMode(prefersDarkMode ? 'dark' : 'light');
+  }, [prefersDarkMode]);
+
+  const colorMode = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+      },
+    }),
+    []
+  );
+
+  let theme = useMemo(
+    () =>
+      createTheme(deepmerge(getDesignTokens(mode), getThemedComponents(mode))),
+    [mode]
+  );
+
+  theme = responsiveFontSizes(theme);
   return (
+    <ColorModeContext.Provider value={colorMode}>
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container disableGutters={true}
@@ -65,7 +88,7 @@ function App() {
                   </Route>
                   <Route path="*" >
                   <div>
-                <h1>Haromnise Questionnaire Data - with Harmony</h1>
+                <h1 style={{color: "white"}}>Harmonise Questionnaire Data - with Harmony</h1>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. </p>
               </div>
                   </Route>
@@ -101,6 +124,7 @@ function App() {
         </Router>
       </Container>
     </ThemeProvider>
+    </ColorModeContext.Provider>
   )
 }
 

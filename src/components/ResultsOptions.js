@@ -1,12 +1,12 @@
 import React, {  useState } from "react"
-import { Paper, Slider, Switch,  Typography, Stack} from '@mui/material'
+import { Card, Slider, Switch,  Typography, Stack} from '@mui/material'
 
 
 export default function ResultsOptions({ resultsOptions, setResultsOptions }) {
   const [threshold, setThreshold] = useState(resultsOptions.threshold);
 
   return (
-    <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "50%", margin:"auto", padding: "1rem" }}>
+    <Card  sx={{ display: "flex", flexDirection: "column", width: "50%", margin:"auto", padding: "1rem" }}>
       <h3>Options</h3>
       <Stack>
       <Stack direction="row" >
@@ -27,8 +27,6 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions }) {
         />
 
         </Stack>
-      
-
-    </Paper>
+    </Card>
   )
 }

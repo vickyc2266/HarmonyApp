@@ -1,24 +1,26 @@
 import React from 'react';
 import { Box, Card, Typography } from '@mui/material';
 import { CircularProgressbar } from 'react-circular-progressbar';
+import { useTheme } from '@mui/material/styles';
 import 'react-circular-progressbar/dist/styles.css';
 
 
 
-const matchUnit = ({ Q1, Q2, percentage }) => {
 
-    const interpolateBetweenColors = (
-        fromColor,
-        toColor,
-        percent
-      ) => {
-        const delta = percent / 100;
-        const r = Math.round(toColor.r + (fromColor.r - toColor.r) * delta);
-        const g = Math.round(toColor.g + (fromColor.g - toColor.g) * delta);
-        const b = Math.round(toColor.b + (fromColor.b - toColor.b) * delta);
-      
-        return `rgba(${r}, ${g}, ${b}, 0.7)`;
-      };
+const MatchUnit = ({ Q1, Q2, percentage }) => {
+  const theme = useTheme();
+  const interpolateBetweenColors = (
+      fromColor,
+      toColor,
+      percent
+    ) => {
+      const delta = percent / 100;
+      const r = Math.round(toColor.r + (fromColor.r - toColor.r) * delta);
+      const g = Math.round(toColor.g + (fromColor.g - toColor.g) * delta);
+      const b = Math.round(toColor.b + (fromColor.b - toColor.b) * delta);
+    
+      return `rgba(${r}, ${g}, ${b}, 0.7)`;
+    };
     
 
   return (
@@ -44,7 +46,8 @@ const matchUnit = ({ Q1, Q2, percentage }) => {
                         stroke:  interpolateBetweenColors({ r: 30, g: 255, b: 30 }, { r: 255, g: 30, b: 30 }, Math.abs(percentage))
                     },
                     text: {
-                        fill:  "#0de5b2",
+                        fill:  theme.palette.primary.dark,
+                        fontWeight: 600,
                         fontSize: '1.5rem'
                     }
                   }}
@@ -65,4 +68,4 @@ const matchUnit = ({ Q1, Q2, percentage }) => {
   );
 };
 
-export default matchUnit;
+export default MatchUnit;
