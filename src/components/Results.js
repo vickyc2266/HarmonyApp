@@ -38,7 +38,8 @@ export default function Results({ fileInfos, apiData, resultsOptions }) {
             a.push({ mqi: i, match: e });
           return a;
         }, []).forEach((i) => {
-          if (i.mqi > qi) twoWays.push(<MatchUnit key={i.mqi + '-' + i.match +'-' + qi } Q1={questions[qi]} Q2={questions[i.mqi]} percentage={Math.round(i.match * 100)} />)
+          if (i.mqi > qi && (resultsOptions.intraInstrument || questions[qi].instrument !== questions[i.mqi].instrument )) 
+            twoWays.push(<MatchUnit key={i.mqi + '-' + i.match +'-' + qi } Q1={questions[qi]} Q2={questions[i.mqi]} percentage={Math.round(i.match * 100)} />)
         });
         return twoWays;
       })}
