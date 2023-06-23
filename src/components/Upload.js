@@ -1,14 +1,14 @@
 import React, { useState } from "react"
 import DragDrop from "./DragDrop";
 import postData from "../utilities/postData";
-import { Box, Accordion, AccordionSummary, AccordionDetails, ListItem, List, Paper, Button, Typography, CircularProgress } from '@mui/material'
+import { Alert, Collapse, Box, Accordion, AccordionSummary, AccordionDetails, ListItem, List, Paper, Button, Typography, CircularProgress } from '@mui/material'
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Close as CloseIcon, Delete as DeleteIcon, ExpandMore as ExpandMoreIcon} from '@mui/icons-material';
 import { useHistory } from "react-router-dom"
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function Upload({ fileInfos, setFileInfos, setApiData }) {
   const [loading, setLoading] = useState(false);
+  const [parseError, setParseError] = useState(false);
   const history = useHistory()
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
@@ -27,6 +27,8 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
             newFileInfos.push(data[0]);
             fileInfos.push(data[0]);
             setFileInfos(newFileInfos)
+          }).catch(e=>{
+            setParseError(true);
           });
       };
       reader.readAsDataURL(file);
@@ -68,7 +70,6 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
     return (
       <Accordion key={instrument_id} >
         <AccordionSummary
-
           expandIcon={<ExpandMoreIcon />}
           sx={{
             flexDirection: "row-reverse", alignItems: "center",
@@ -98,6 +99,26 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
     <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
       <DragDrop filesReceiver={filesReceiver} sx={{ margin: "2rem" }} />
       <Box sx={{ marginTop: "2rem" }}>
+      <Collapse in={parseError}>
+        <Alert
+        severity="error"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setParseError(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 2 }}
+        >
+          The file could not be parsed
+        </Alert>
+      </Collapse>
         {fileInfos.length ? fileInfos.map(FileInfo) : ""}
       </Box>
       <Button
