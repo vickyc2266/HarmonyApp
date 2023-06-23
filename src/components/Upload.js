@@ -30,6 +30,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
             fileInfos.push(data[0]);
             setFileInfos(newFileInfos)
           }).catch(e=>{
+            console.log(e)
             setParseError(true);
           });
       };
@@ -117,7 +118,8 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
               setLoading(false);
               history.push("/model")
             }).catch(e=>{
-
+              console.log(e);
+              setMatchError(true);
             })
           }
         }
