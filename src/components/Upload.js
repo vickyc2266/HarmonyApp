@@ -1,14 +1,16 @@
 import React, { useState } from "react"
 import DragDrop from "./DragDrop";
 import postData from "../utilities/postData";
-import { Alert, Collapse, Box, Accordion, AccordionSummary, AccordionDetails, ListItem, List, Paper, Button, Typography, CircularProgress } from '@mui/material'
+import { Box, Accordion, AccordionSummary, AccordionDetails, ListItem, List, Paper, Button, Typography, CircularProgress } from '@mui/material'
 import IconButton from '@mui/material/IconButton';
-import { Close as CloseIcon, Delete as DeleteIcon, ExpandMore as ExpandMoreIcon} from '@mui/icons-material';
+import {  Delete as DeleteIcon, ExpandMore as ExpandMoreIcon} from '@mui/icons-material';
 import { useHistory } from "react-router-dom"
+import InlineFeedback from "./InlineFeedback";
 
 export default function Upload({ fileInfos, setFileInfos, setApiData }) {
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
+  const [matchError, setMatchError] = useState(false);
   const history = useHistory()
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
@@ -99,28 +101,10 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
     <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
       <DragDrop filesReceiver={filesReceiver} sx={{ margin: "2rem" }} />
       <Box sx={{ marginTop: "2rem" }}>
-      <Collapse in={parseError}>
-        <Alert
-        severity="error"
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                setParseError(false);
-              }}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-          sx={{ mb: 2 }}
-        >
-          The file could not be parsed
-        </Alert>
-      </Collapse>
+        <InlineFeedback message="The file could not be parsed"  severity = "error" state={parseError} setState={setParseError} /> 
         {fileInfos.length ? fileInfos.map(FileInfo) : ""}
       </Box>
+      <InlineFeedback message="The match proceedure failed"  severity = "error" state={matchError} setState={setMatchError} /> 
       <Button
         variant="contained"
         sx={{ margin: "2rem" }}
@@ -132,6 +116,8 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
               setApiData(data);
               setLoading(false);
               history.push("/model")
+            }).catch(e=>{
+
             })
           }
         }
@@ -139,6 +125,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData }) {
         {!loading && <Typography>Check your Matches</Typography>}
         {loading && <CircularProgress/>}
       </Button>
+      
     </Paper>
   )
 }
