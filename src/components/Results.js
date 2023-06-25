@@ -9,13 +9,11 @@ import MatchUnit from "./MatchUnit";
 export default function Results({ fileInfos, apiData, resultsOptions }) {
   const [questions, setQuestions] = useState([])
   
-
-
   useEffect(() => {
     if (fileInfos && fileInfos.length) {
       let questions = [];
       fileInfos.forEach((i) => {
-        let instrument = new Instrument(i.instrument_name, i.language, i.instrument_id,);
+        let instrument = new Instrument(i.instrument_name, i.language, i.instrument_id, i.grouping, );
         i.questions.forEach((q, index) => {
           let question = new Question(index, q.question_text, q.question_no, q.question_intro, q.options);
           question.setInstrument(instrument);

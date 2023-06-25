@@ -1,0 +1,55 @@
+import * as React from 'react';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+    },
+  },
+};
+
+export default function ExistingInstruments({existingReceiver, existingInstruments, fileInfos}) {
+
+  const allInstrumentNames = existingInstruments.map(i => i.instrument_name)
+  const instrumentNames = fileInfos.map(i => i.instrument_name)
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    existingReceiver( typeof value === 'string' ? value.split(',') : value )
+  };
+
+  return (
+    <div>
+      <FormControl sx={{ mt: 2, width: '100%' }}>
+        <InputLabel id="multiple-checkbox-label">Choose from existing instruments</InputLabel>
+        <Select
+
+          id="multiple-checkbox"
+          multiple
+          value={instrumentNames}
+          onChange={handleChange}
+          input={<OutlinedInput label="ExistingInstruments" />}
+          renderValue={(selected) => selected.join(', ')}
+          MenuProps={MenuProps}
+        >
+          {allInstrumentNames.map((name) => (
+            <MenuItem key={name} value={name}>
+              <Checkbox checked={instrumentNames.indexOf(name) > -1} />
+              <ListItemText primary={name} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </div>
+  );
+}

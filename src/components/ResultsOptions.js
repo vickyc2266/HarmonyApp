@@ -25,7 +25,7 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions }) {
         Show within-instrument matches 
       </Typography>
       <Switch 
-        value={resultsOptions.intraInstrument}
+        value={resultsOptions.intraInstrument?'on':'off'}
         onChange={(e, value) => {
           let thisOptions = {...resultsOptions};
           thisOptions.intraInstrument = value;

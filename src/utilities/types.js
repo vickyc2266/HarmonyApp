@@ -11,10 +11,11 @@ function Question(question_index, question_text, question_no="", question_intro=
         this.instrument.addQuestion(this);
     }
 }
-function Instrument(name, language="en", id = "",  questions = []) {
+function Instrument(name, language="en", id = "", grouping="",  questions = []) {
     this.name = name;
     this.language = language;
     this.id = id;
+    this.grouping = grouping;
     this.questions = questions;
     this.addQuestion = (question) =>{
         if(this.questions.indexOf(question) === -1) {

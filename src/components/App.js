@@ -14,9 +14,10 @@ import logoWithText from '../img/Logo-04-min.svg'
 import ResultsOptions from "./ResultsOptions";
 import { deepmerge } from '@mui/utils';
 import { ColorModeContext } from "../contexts/ColorModeContext"
-
+import postData from "../utilities/postData"
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
+  const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({threshold:70, intraInstrument:true});
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -25,6 +26,15 @@ function App() {
   useEffect(() => {
     setMode(prefersDarkMode ? 'dark' : 'light');
   }, [prefersDarkMode]);
+
+  useEffect(() => {
+    postData("https://api.harmonydata.org/text/examples").then((data) => {
+        setExistingInstruments(data)
+        console.log(data)
+      }).catch(e => {
+        console.log(e)
+      });
+  }, [])
 
   const colorMode = useMemo(
     () => ({
@@ -115,7 +125,7 @@ function App() {
                     <Results fileInfos={fileInfos} apiData={apiData} resultsOptions = {resultsOptions} />
                   </Route>
                   <Route path="*" >
-                    <Upload fileInfos={fileInfos} setFileInfos={setFileInfos} setApiData={setApiData} />
+                    <Upload fileInfos={fileInfos} setFileInfos={setFileInfos} setApiData={setApiData} existingInstruments={existingInstruments} />
                   </Route>
                 </Switch>
               </Box>
