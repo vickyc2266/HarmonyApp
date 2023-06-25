@@ -1,6 +1,6 @@
 
 
-async function postData(url = "", data = {}, mimetype = "application/json", timeout = 8000) {
+async function postData(url = "", data = {}, timeout = 8000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);  
   const response = await fetch(url, {
@@ -9,7 +9,7 @@ async function postData(url = "", data = {}, mimetype = "application/json", time
       cache: "no-cache", 
       credentials: "same-origin",
       headers: {
-        "Content-Type": mimetype
+        "Content-Type": "application/json"
       },
       redirect: "follow", 
       referrerPolicy: "no-referrer", 

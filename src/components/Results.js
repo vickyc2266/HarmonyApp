@@ -24,7 +24,7 @@ export default function Results({ fileInfos, apiData, resultsOptions }) {
       })
       setQuestions(questions);
     }
-  }, [fileInfos, apiData, resultsOptions]);
+  }, [fileInfos]);
 
 
   return (
@@ -34,7 +34,7 @@ export default function Results({ fileInfos, apiData, resultsOptions }) {
         let twoWays = [];
         // extract the indexes of questions over current thrshold
         matches.reduce(function (a, e, i) {
-          if (Math.abs(e) > (resultsOptions.threshold/100))
+          if (Math.abs(e) >= (resultsOptions.threshold/100))
             a.push({ mqi: i, match: e });
           return a;
         }, []).forEach((i) => {
