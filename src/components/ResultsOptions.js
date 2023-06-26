@@ -17,7 +17,11 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions }) {
         min={30} 
         valueLabelDisplay="auto" 
         onChange={(e, value) => {setThreshold(value)}}
-        onChangeCommitted={(e, value) => {let thisOptions = {...resultsOptions}; thisOptions.threshold = isNaN(value)?70:value; setResultsOptions(thisOptions)}}
+        onChangeCommitted={(e, value) => {
+          let thisOptions = {...resultsOptions};
+           thisOptions.threshold = isNaN(value)?70:value; 
+           setResultsOptions(thisOptions)
+          }}
         />
         <Divider sx={{mt:1, mb:1}}/>
         <Stack direction="row" sx={{width:"100%", alignItems:"center", justifyContent:"space-between"}} >
@@ -30,7 +34,7 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions }) {
           let thisOptions = {...resultsOptions};
           thisOptions.intraInstrument = value;
           setResultsOptions(thisOptions);
-          console.log(thisOptions);}}
+        }}
         />
       </Stack>
       

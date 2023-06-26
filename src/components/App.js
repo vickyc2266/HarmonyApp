@@ -98,8 +98,12 @@ function App() {
                   </Route>
                   <Route path="*" >
                   <div>
-                <h1 style={{color: "white"}}>Harmonise Questionnaire Data - with Harmony</h1>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. </p>
+                <h1 style={{color: "white"}}>Harmonise questionnaire data - with Harmony</h1>
+                <p>Harmony is a tool for retrospective harmonisation of questionnaire data.</p>
+                <p>If you want to compare data from different surveys, such as GAD-7 and PHQ-9, 
+                  Harmony can identify which questions match.</p>
+                <p>
+                  <a href="https://harmonydata.org/frequently-asked-questions">FAQs</a> - <a href="https://harmonydata.org/privacy-policy">Privacy policy</a></p>
               </div>
                   </Route>
                 </Switch>
