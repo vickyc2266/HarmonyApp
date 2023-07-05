@@ -80,7 +80,21 @@ function App() {
     })
   }
 
-
+  const saveToMyHarmony = () => {
+    let h = {}
+    h.apiData = JSON.parse(JSON.stringify(apiData));
+    h.resultsOptions = resultsOptions;
+    h.public = false;
+    h.created = new Date();
+    return new Promise((resolve, reject) => {
+      storeHarmonisation(h).then((docRef) => {
+        resolve(window.location.origin + "/#/match/" + docRef);
+      }).catch(e => {
+        console.log(e)
+        reject("Could not create share link")
+      })
+    })
+}
 
  const downloadExcel = () => {
     const exportedData = apiData.map(instrument=>{
