@@ -1,0 +1,3 @@
+[submodule "harmonywebsite"]
+	path = harmonywebsite
+	url = git@github.com:harmonydata/harmonywebsite.git
