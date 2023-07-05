@@ -24,7 +24,7 @@ function App() {
   const [resultsOptions, setResultsOptions] = useState({ threshold: 70, intraInstrument: true });
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [mode, setMode] = useState();
-  const { storeHarmonisation } = useData();
+  const { storeHarmonisation, serverTimestamp } = useData();
   
 
   useEffect(() => {
@@ -68,11 +68,11 @@ function App() {
     console.log(h.apiData)
     h.resultsOptions = resultsOptions;
     h.public = true;
-    h.created = new Date();
+    h.created = serverTimestamp();
     return new Promise((resolve, reject) => {
       storeHarmonisation(h).then((doc) => {
         console.log(doc)
-        resolve(window.location.origin + "/#/model/" + doc.id);
+        resolve(window.location.origin + "/app/#/model/" + doc.id);
       }).catch(e => {
         console.log(e)
         reject("Could not create share link")
@@ -80,21 +80,7 @@ function App() {
     })
   }
 
-  const saveToMyHarmony = () => {
-    let h = {}
-    h.apiData = JSON.parse(JSON.stringify(apiData));
-    h.resultsOptions = resultsOptions;
-    h.public = false;
-    h.created = new Date();
-    return new Promise((resolve, reject) => {
-      storeHarmonisation(h).then((docRef) => {
-        resolve(window.location.origin + "/match/" + docRef);
-      }).catch(e => {
-        console.log(e)
-        reject("Could not create share link")
-      })
-    })
-}
+
 
  const downloadExcel = () => {
     const exportedData = apiData.map(instrument=>{

@@ -1,5 +1,5 @@
 import React, { createContext, useContext} from 'react';
-import { doc, collection, query, where, getDocs, getDoc,  setDoc, addDoc } from "firebase/firestore"
+import { doc, collection, query, where, getDocs, getDoc,  setDoc, addDoc, updateDoc, serverTimestamp } from "firebase/firestore"
 
 import { useAuth } from "./AuthContext"
 import {db} from "../firebase"
@@ -15,9 +15,14 @@ export function DataProvider({ children }) {
   
   const getPublicHarmonisations = async (docID) => {
     if (docID) {
-        const h = await getDoc(doc(db, "harmonisations", docID)) 
-        if (h.exists())
-            return h.data()
+        const docRef = doc(db, "harmonisations", docID)
+        const h = await getDoc(docRef) 
+        if (h.exists()){
+            updateDoc(docRef, {
+                lastAccessed: serverTimestamp()
+            });
+            return h.data();
+        }
         else
             return Promise.reject(Error(`No such harmonisation: .${docID}`))
     } else {
@@ -63,13 +68,15 @@ export function DataProvider({ children }) {
           return addDoc(collection(db, 'harmonisations'), harmonisation);
       }
   }
+  
 
   return (
     <DataProviderContext.Provider value={
         {
             storeHarmonisation,
             getMyHarmonisations,
-            getPublicHarmonisations
+            getPublicHarmonisations,
+            serverTimestamp
         }}>
       {children}
     </DataProviderContext.Provider>

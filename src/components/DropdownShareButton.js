@@ -14,19 +14,20 @@ export default function DropdownShareButton({getShareLink}) {
     const target = e.currentTarget.id;
     
     const ahref = await getShareLink();
+    const encAhref = encodeURIComponent(ahref);
     var link
 
     switch (target) {
       case "facebook":
-        link = `https://www.facebook.com/sharer/sharer.php?u=${ahref}`
+        link = `https://www.facebook.com/sharer/sharer.php?u=${encAhref}`
         open(link)
         break
       case "twitter":
-        link = `https://twitter.com/intent/tweet?url=${ahref}`
+        link = `https://twitter.com/intent/tweet?url=${encAhref}`
         open(link)
         break
       case "reddit":
-        link = `https://www.reddit.com/submit?url=${ahref}`
+        link = `https://www.reddit.com/submit?url=${encAhref}`
         open(link)
         break
       case "copy":

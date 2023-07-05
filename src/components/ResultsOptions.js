@@ -3,9 +3,10 @@ import { Divider, Card, Slider, Switch, Typography, Stack, Button } from '@mui/m
 import { ReactComponent as xlsxSVG } from "../img/file-excel-solid.svg"
 import DropdownShareButton from "./DropdownShareButton";
 import SvgIcon from '@mui/material/SvgIcon';
-
+import { useAuth } from "../contexts/AuthContext"
 export default function ResultsOptions({ resultsOptions, setResultsOptions, makePublicShareLink, saveToMyHarmony, downloadExcel }) {
   const [ threshold, setThreshold ] = useState(resultsOptions.threshold);
+  const {currentUser} = useAuth();
 
   useEffect(()=>{
     setThreshold(resultsOptions.threshold);
@@ -47,7 +48,7 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions, make
         </Stack>
         <Divider sx={{ mt: 1, mb: 1 }} />
         <Stack direction="row" sx={{ width: "100%", alignItems: "center", justifyContent: "space-around" }} >
-        <DropdownShareButton getShareLink={makePublicShareLink}/>
+        {currentUser && <DropdownShareButton getShareLink={makePublicShareLink} />}
         <Button variant="contained" onClick={()=>downloadExcel()} >
         <SvgIcon component={xlsxSVG} inheritViewBox />
           <Typography> Export</Typography>
