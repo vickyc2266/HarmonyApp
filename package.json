@@ -23,7 +23,7 @@
     "react-scripts": "^5.0.1",
     "react-transition-group": "^4.4.5",
     "typeface-montserrat": "^1.1.13",
-    "xlsx": ">=0.19.3"
+    "xlsx": ">=0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
