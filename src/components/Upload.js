@@ -7,7 +7,7 @@ import { Delete as DeleteIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-m
 import { useHistory } from "react-router-dom"
 import InlineFeedback from "./InlineFeedback";
 import ExistingInstruments from "./ExistingInstruments";
-
+import { simplifyApi } from "../utilities/simplifyApi";
 export default function Upload({ fileInfos, setFileInfos, setApiData, existingInstruments }) {
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
@@ -148,7 +148,9 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
           () => {
             setLoading(true);
             postData('https://api.harmonydata.org/text/match', { instruments: fileInfos }, 30000).then((data) => {
-              setApiData(data);
+              let simpleApi = simplifyApi(data, fileInfos);
+              setApiData(simpleApi);
+              console.log(simpleApi);
               setLoading(false);
               history.push("/model")
             }).catch(e => {
@@ -158,7 +160,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
           }
         }
       >
-        {!loading && <Typography>Check your Matches</Typography>}
+        {!loading && <Typography>Harmonise</Typography>}
         {loading && <CircularProgress />}
       </Button>
 

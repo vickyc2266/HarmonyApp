@@ -9,12 +9,14 @@ export default function InlineFeedback({ severity, message, state, setState}) {
    <Collapse in={state}>
     <Alert
     severity={severity}
+
       action={
-        <IconButton
+        setState && <IconButton
           aria-label="close"
           color="inherit"
           size="small"
           onClick={() => {
+
             setState(false);
           }}
         >

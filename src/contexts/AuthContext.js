@@ -17,8 +17,6 @@ export function AuthProvider({ children }) {
     const provider = new GoogleAuthProvider();
     return signInWithPopup(auth, provider)
     .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      console.log(result);
       return result.user;
     }).catch((error) => {
       return GoogleAuthProvider.credentialFromError(error);

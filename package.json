@@ -12,7 +12,9 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "firebase": "^9.20.0",
+    "material-ui-popup-state": "^5.0.9",
     "mui-nested-menu": "^3.2.1",
+    "nth-check": ">=2.0.1",
     "react": "^18.2.0",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "^18.2.0",
@@ -21,7 +23,7 @@
     "react-scripts": "^5.0.1",
     "react-transition-group": "^4.4.5",
     "typeface-montserrat": "^1.1.13",
-    "nth-check": ">=2.0.1"
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,15 +1,6 @@
 
-function Question(question_index, question_text, question_no="", question_intro="", options=[], instrument = null) {
-    this.index = question_index
-    this.text = question_text;
-    this.instrument = instrument;
-    this.no = question_no;
-    this.intro = question_intro;
-    this.options = options;
-    this.setInstrument = (instrument) => {
-        this.instrument = instrument;
-        this.instrument.addQuestion(this);
-    }
+function Question(descriptor = {}) {
+    for(var k in descriptor) this[k]=descriptor[k];
 }
 function Instrument(name, language="en", id = "", grouping="",  questions = []) {
     this.name = name;
@@ -17,9 +8,13 @@ function Instrument(name, language="en", id = "", grouping="",  questions = []) 
     this.id = id;
     this.grouping = grouping;
     this.questions = questions;
+    this.minqidx = 0;
+    this.maxqidx = 0;
     this.addQuestion = (question) =>{
         if(this.questions.indexOf(question) === -1) {
             this.questions.push(question);
+            if (this.minqidx>question.question_index) this.minqidx = question.question_index
+            if (this.maxqidx<question.question_index) this.maxqidx = question.question_index
         }
     }
 }
