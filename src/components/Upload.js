@@ -36,7 +36,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
       }))
     });
     Promise.all(frp).then((allFiles) => {
-      postData("https://api.harmonydata.org/text/parse", allFiles, 30000).then((data) => {
+      postData("https://api.harmonydata.org/text/parse", allFiles,15000).then((data) => {
         const newFileInfos = [...fileInfos]
         // Load each returned file / instrument in the data 
         data.forEach(instrument => {
