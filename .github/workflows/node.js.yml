@@ -24,10 +24,13 @@ jobs:
         cache: 'npm'
     - run: "wget https://harmonydata.github.io/website/public.tar.gz"
       name: Download static page. The source is in https://github.com/harmonydata/website. 
-    - run: "tar -xvf public.tar.gz -C ./public"
-      name: Unzip the tar
-    - run: "mv public/public public/blog"
-      name: Place the static blog content under public/blog
+#    - name: create a folder to put the React app in 
+#      run: "mkdir public/app" 
+#    - name: move the React app under public/app
+#      run: "mv public/* public/app/"
+#    - name: unzip the static blog content
+#      run: "tar -xvf public.tar.gz"
+#      name: Unzip the tar and put it in the public folder
     - run: npm ci
     - run: npm run build --if-present
     # - run: npm test
