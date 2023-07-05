@@ -22,9 +22,10 @@ jobs:
       with:
         node-version: '18.x'
         cache: 'npm'
-    #- run: "wget https://harmonydata.github.io/website/public.tar.gz"
-    #- name: Download static page. The source is in https://github.com/harmonydata/website. 
-    # - run: "tar -xvf public.tar.gz" -> this puts it in public
+    - run: "wget https://harmonydata.github.io/website/public.tar.gz"
+    - name: Download static page. The source is in https://github.com/harmonydata/website. 
+    - run: "tar -xvf public.tar.gz -C ./public"
+    - run: "mv public/public public/blog"
     - run: npm ci
     - run: npm run build --if-present
     # - run: npm test
