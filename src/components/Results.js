@@ -31,8 +31,8 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
       return (apiData.map(instrument => {
         return instrument.questions.map(q => {
           return q.matches.reduce(function (a, e, i) {
-            if (Math.abs(e) >= (resultsOptions.threshold / 100) && (resultsOptions.intraInstrument || (i + q.question_index) > instrument.maxqidx))
-              a.push({ qi: q.question_index, mqi: i + q.question_index, match: e });
+            if (Math.abs(e) >= (resultsOptions.threshold / 100) && (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx))
+              a.push({ qi: q.question_index, mqi: i + 1 + q.question_index, match: e });
             return a;
           }, [])
         }).flat();

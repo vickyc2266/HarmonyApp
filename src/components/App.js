@@ -101,9 +101,9 @@ function App() {
       return instrument.questions.map(q=>{
         return q.matches.reduce(function (a, e, i) {
           if (Math.abs(e) >= (resultsOptions.threshold/100) && 
-              (resultsOptions.intraInstrument || (i+q.question_index) > instrument.maxqidx )) {
-            var mq = getQuestion(i+q.question_index);
-            var mi = getInstrument(i+q.question_index);
+              (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx )) {
+            var mq = getQuestion(i + 1 + q.question_index);
+            var mi = getInstrument(i + 1 +q.question_index);
             a.push(
               {
                 instrument1: instrument.name,
