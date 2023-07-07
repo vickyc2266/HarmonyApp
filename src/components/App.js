@@ -21,10 +21,10 @@ function App() {
   const [fileInfos, setFileInfos] = useState([]);
   const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
-  const [resultsOptions, setResultsOptions] = useState({ threshold: 70, intraInstrument: true });
+  const [resultsOptions, setResultsOptions] = useState({ threshold: 70, intraInstrument: false });
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [mode, setMode] = useState();
-  const { storeHarmonisation, serverTimestamp } = useData();
+  const { storeHarmonisation } = useData();
   
 
   useEffect(() => {
@@ -50,25 +50,20 @@ function App() {
   );
 
   const getQuestion = (qidx) => {
-    return apiData.map((i) =>{
+    return apiData.instruments.map((i) =>{
       return i.questions
     }).flat().filter((q) =>{
       return q.question_index == qidx
     })[0]
   }
 
-  const getInstrument = (qidx) => {
-    return apiData.filter((i) =>{
-      return i.minqidx<=qidx && i.maxqidx >=qidx
-    })[0]
-  }
+  
   const makePublicShareLink = () => {
     let h = {}
-    h.apiData = JSON.parse(JSON.stringify(apiData));
-    console.log(h.apiData)
+    h.apiData = apiData;
     h.resultsOptions = resultsOptions;
     h.public = true;
-    h.created = serverTimestamp();
+    
     return new Promise((resolve, reject) => {
       storeHarmonisation(h).then((doc) => {
         console.log(doc)
@@ -97,13 +92,13 @@ function App() {
 }
 
  const downloadExcel = () => {
-    const exportedData = apiData.map(instrument=>{
+    const exportedData = apiData.instruments.map(instrument=>{
       return instrument.questions.map(q=>{
         return q.matches.reduce(function (a, e, i) {
           if (Math.abs(e) >= (resultsOptions.threshold/100) && 
               (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx )) {
             var mq = getQuestion(i + 1 + q.question_index);
-            var mi = getInstrument(i + 1 +q.question_index);
+            var mi = mq.instrument;
             a.push(
               {
                 instrument1: instrument.name,

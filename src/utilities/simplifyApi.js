@@ -11,7 +11,8 @@ export function simplifyApi(apiResult, apiCall) {
             qidx++
             let question = new Question(
                 {
-                    question_index: qidx, 
+                    question_index: qidx,
+                    instrument: instrument, 
                     instrument_index: index,
                     question_text: q.question_text,
                     question_no: q.question_no,
@@ -25,5 +26,5 @@ export function simplifyApi(apiResult, apiCall) {
     });
     instruments.push(instrument)
 })
-return instruments;
+return {instruments:instruments};
 }

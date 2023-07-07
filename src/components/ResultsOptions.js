@@ -4,6 +4,8 @@ import { ReactComponent as xlsxSVG } from "../img/file-excel-solid.svg"
 import DropdownShareButton from "./DropdownShareButton";
 import SvgIcon from '@mui/material/SvgIcon';
 import { useAuth } from "../contexts/AuthContext"
+
+
 export default function ResultsOptions({ resultsOptions, setResultsOptions, makePublicShareLink, saveToMyHarmony, downloadExcel }) {
   const [ threshold, setThreshold ] = useState(resultsOptions.threshold);
   const {currentUser} = useAuth();

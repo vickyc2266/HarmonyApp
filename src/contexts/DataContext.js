@@ -21,7 +21,7 @@ export function DataProvider({ children }) {
             updateDoc(docRef, {
                 lastAccessed: serverTimestamp()
             });
-            return h.data();
+            return undoPrepForFireStore(h.data());
         }
         else
             return Promise.reject(Error(`No such harmonisation: .${docID}`))
@@ -63,12 +63,54 @@ export function DataProvider({ children }) {
           if (doc.exists() && doc.data.uid != currentUser.uid) {
               Promise.reject(Error(`Specified docID is not owned by current user`))
           }
-          return setDoc(doc(db, 'harmonisations', docID), harmonisation)
+          harmonisation.updated = serverTimestamp();
+          return setDoc(doc(db, 'harmonisations', docID), prepForFireStore(harmonisation))
       } else {
-          return addDoc(collection(db, 'harmonisations'), harmonisation);
+          harmonisation.created = serverTimestamp()
+          return addDoc(collection(db, 'harmonisations'), prepForFireStore(harmonisation));
       }
   }
+
+  const reportMisMatch  = async (mismatch) => { 
+    
+    var q1 = {...mismatch.q1}
+    var q2 = {...mismatch.q2}
+    var m={q1:q1, q2:q2}
+
+    m.uid = currentUser?currentUser.uid:'anon';
+    m.q1.instrument_name = m.q1.instrument.name
+    m.q2.instrument_name = m.q2.instrument.name
+    m.q1.instrument_id = m.q1.instrument.id
+    m.q2.instrument_id = m.q2.instrument.id
+    delete m.q1.instrument
+    delete m.q2.instrument
+    m.created = serverTimestamp();
   
+    return addDoc(collection(db, 'mismatches'), m);
+}
+    const prepForFireStore = (harmonisation) => {
+        harmonisation.apiData.instruments.map(instrument =>{
+            instrument.questions.map(question =>{
+                //This is a circular reference but can't be stored
+                delete question['instrument'];
+            })
+        })
+        harmonisation.apiData = JSON.parse(JSON.stringify(harmonisation.apiData));
+        console.log("prepped")
+        console.log(harmonisation)
+        return harmonisation
+    }
+    const undoPrepForFireStore = (harmonisation) => {
+        harmonisation.apiData.instruments.map(instrument =>{
+            instrument.questions.map(question =>{
+                //This is a circular reference but can't be stored
+                question['instrument'] = instrument;
+            })
+        })
+        console.log("unprepped")
+        console.log(harmonisation)
+        return harmonisation
+    }
 
   return (
     <DataProviderContext.Provider value={
@@ -76,7 +118,8 @@ export function DataProvider({ children }) {
             storeHarmonisation,
             getMyHarmonisations,
             getPublicHarmonisations,
-            serverTimestamp
+            reportMisMatch,
+            prepForFireStore,
         }}>
       {children}
     </DataProviderContext.Provider>

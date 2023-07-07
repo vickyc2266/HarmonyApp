@@ -8,6 +8,9 @@ import { useHistory } from "react-router-dom"
 import InlineFeedback from "./InlineFeedback";
 import ExistingInstruments from "./ExistingInstruments";
 import { simplifyApi } from "../utilities/simplifyApi";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function Upload({ fileInfos, setFileInfos, setApiData, existingInstruments }) {
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
@@ -36,17 +39,29 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
       }))
     });
     Promise.all(frp).then((allFiles) => {
-      postData("https://api.harmonydata.org/text/parse", allFiles,15000).then((data) => {
+      toast.promise(
+        new Promise((resolve, reject) => { 
+          postData("https://api.harmonydata.org/text/parse", allFiles,15000).then((data) => {
         const newFileInfos = [...fileInfos]
         // Load each returned file / instrument in the data 
         data.forEach(instrument => {
           newFileInfos.push(instrument);
         })
         setFileInfos(newFileInfos)
+        resolve(true);
       }).catch(e => {
         console.log(e)
         setParseError(true);
+        reject("Parse Error")
       });
+    }),
+     {
+       pending: 'Parsing files - this may take a while',
+       success: 'Success!',
+       error: 'Something went wrong - please try again'
+     }
+     )
+     
     });
   }
 
@@ -130,7 +145,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
 
   return (
     <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
-
+      <ToastContainer/>
       <InlineFeedback message="The file could not be parsed" severity="error" state={parseError} setState={setParseError} />
       <InlineFeedback message="The match proceedure failed" severity="error" state={matchError} setState={setMatchError} />
 

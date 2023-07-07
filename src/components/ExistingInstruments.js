@@ -36,7 +36,7 @@ export default function ExistingInstruments({existingReceiver, existingInstrumen
 
           id="multiple-checkbox"
           multiple
-          value={instrumentNames}
+          value={instrumentNames.filter(i=>{return allInstrumentNames.includes(i)})}
           onChange={handleChange}
           input={<OutlinedInput label="ExistingInstruments" />}
           renderValue={(selected) => selected.join(', ')}
