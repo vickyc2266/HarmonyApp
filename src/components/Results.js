@@ -64,7 +64,7 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
         return im.q1.question_index + "-" + im.q2.question_index
       })
     }
-    console.log(ignoredMatches);
+
     if (Object.keys(apiData).length) {
       return (apiData.instruments.map(instrument => {
         return instrument.questions.map(q => {
