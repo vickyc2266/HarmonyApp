@@ -92,6 +92,14 @@ function App() {
 }
 
  const downloadExcel = () => {
+
+  var ignoredMatches = []
+  if (Object.keys(apiData).includes('ignoredMatches')) {
+    ignoredMatches = apiData.ignoredMatches
+    ignoredMatches = ignoredMatches.map(im => {
+      return im.q1.question_index + "-" + im.q2.question_index
+    })
+  }
     const exportedData = apiData.instruments.map(instrument=>{
       return instrument.questions.map(q=>{
         return q.matches.reduce(function (a, e, i) {
@@ -99,6 +107,7 @@ function App() {
               (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx )) {
             var mq = getQuestion(i + 1 + q.question_index);
             var mi = mq.instrument;
+            var ignore = ignoredMatches.includes(q.question_index + "-" +  (i + 1 + q.question_index))
             a.push(
               {
                 instrument1: instrument.name,
@@ -109,7 +118,8 @@ function App() {
                 question2_no: mq.question_no,
                 question2_text: mq.question_text,
                 question2_topics: mq.topics_auto.toString(),
-                match: e 
+                match: e ,
+                flagged_as_ignore: ignore
               });
             }
           return a;
