@@ -25,7 +25,8 @@ export default function ExistingInstruments({existingReceiver, existingInstrumen
     const {
       target: { value },
     } = event;
-    existingReceiver( typeof value === 'string' ? value.split(',') : value )
+    console.log(value)
+    existingReceiver( value )
   };
 
   return (

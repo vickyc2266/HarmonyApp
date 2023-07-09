@@ -65,22 +65,36 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
     });
   }
 
-  function existingReceiver(instrumentList) {
-    const newFileInfos = [...fileInfos]
+  function existingReceiver(selected) {
+    var newFileInfos = [...fileInfos]
     // Add the selected instruments to the infoList - attaching a instrument grouping key if needed
-    instrumentList.forEach(instrumentName => {
-      let instrument =  existingInstruments.filter(
-        (inst) => { return inst.instrument_name === instrumentName }
+    // work through the current total selection and ensure any existing ones are in out out as required.
+    const existingInstrumentIDs = existingInstruments.map(ei => {
+      return ei.instrument_id
+    });
+
+    // trim out any which are existing instruments but not selected
+    newFileInfos = newFileInfos.map((fi) =>{
+      if ((existingInstrumentIDs.includes(fi.instrument_id) && selected.includes(fi.instrument_name)) ||
+         (!existingInstrumentIDs.includes(fi.instrument_id))) {
+        return fi;
+         }
+    }).filter(i=>{return i});
+
+    // add in any selected which are not already in there
+    selected.forEach(sin=>{
+      let si =  existingInstruments.filter(
+        (inst) => { return inst.instrument_name === sin }
       )[0];
-      instrument.grouping = grouping;
-      // do not add them more than once
+      si.grouping = grouping;
       if(newFileInfos.filter((inst)=> {
-        return inst.instrument_id === instrument.instrument_id;
+        return inst.instrument_id === si.instrument_id;
       }).length === 0) {
-        newFileInfos.push(instrument)
+        console.log("adding " + si.instrument_name)
+        newFileInfos.push(si)
       }
-      
     })
+  
     setFileInfos(newFileInfos)
   }
 
