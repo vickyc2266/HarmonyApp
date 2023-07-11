@@ -32,7 +32,7 @@ function App() {
   }, [prefersDarkMode]);
 
   useEffect(() => {
-    postData("https://api.harmonydata.org/text/examples").then((data) => {
+    postData(process.env.REACT_APP_API_EXAMPLES).then((data) => {
       setExistingInstruments(data)
       console.log(data)
     }).catch(e => {

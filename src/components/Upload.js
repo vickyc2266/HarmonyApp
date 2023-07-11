@@ -41,7 +41,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
     Promise.all(frp).then((allFiles) => {
       toast.promise(
         new Promise((resolve, reject) => { 
-          postData("https://api.harmonydata.org/text/parse", allFiles,15000).then((data) => {
+          postData(process.env.REACT_APP_API_PARSE, allFiles, 15000).then((data) => {
         const newFileInfos = [...fileInfos]
         // Load each returned file / instrument in the data 
         data.forEach(instrument => {
@@ -176,7 +176,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
         onClick={
           () => {
             setLoading(true);
-            postData('https://api.harmonydata.org/text/match', { instruments: fileInfos }, 30000).then((data) => {
+            postData(process.env.REACT_APP_API_MATCH, { instruments: fileInfos }, 30000).then((data) => {
               let simpleApi = simplifyApi(data, fileInfos);
               setApiData(simpleApi);
               console.log(simpleApi);
