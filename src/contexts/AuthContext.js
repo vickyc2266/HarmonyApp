@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react"
-import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "firebase/auth";
+import { GithubAuthProvider, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase"
 
 
@@ -13,18 +13,23 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState({})
   const [loading, setLoading] = useState(true)
 
-  const googleOAuth = async () => {
-    const provider = new GoogleAuthProvider();
+  const OAuth = async (provider) => {
     return signInWithPopup(auth, provider)
     .then((result) => {
       return result.user;
     }).catch((error) => {
-      return GoogleAuthProvider.credentialFromError(error);
+      return provider.credentialFromError(error);
     });
   };
 
   function signInWithGoogle() {
-    return googleOAuth();
+    return OAuth(new GoogleAuthProvider());
+  }
+  function signInWithTwitter() {
+    return OAuth(new TwitterAuthProvider());
+  }
+  function signInWithGitHub() {
+    return OAuth(new GithubAuthProvider());
   }
 
   function signup(email, password) {
@@ -68,7 +73,10 @@ export function AuthProvider({ children }) {
     resetPassword,
     updateEmail,
     updatePassword,
-    signInWithGoogle
+    signInWithGoogle,
+    signInWithGitHub,
+    signInWithTwitter
+  
   }
 
   return (

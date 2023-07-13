@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext"
 import ThemeToggle from './ThemeToggle';
 import GoogleIcon from '@mui/icons-material/Google'
 import GitHubIcon from '@mui/icons-material/GitHub';
+import TwitterIcon from '@mui/icons-material/Twitter';
 const settings = ['My harmonizations', 'Logout'];
 
 const SettingsIcons = {
@@ -13,7 +14,7 @@ const SettingsIcons = {
 }
 function HarmonyAppBar() {
   const [anchorUser, setAnchorUser] = React.useState(null);
-  const { currentUser, logout, signInWithGoogle } = useAuth();
+  const { currentUser, logout, signInWithGoogle, signInWithGitHub, signInWithTwitter } = useAuth();
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -102,9 +103,13 @@ function HarmonyAppBar() {
                 <GoogleIcon />
                 <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with Google</Typography>
               </MenuItem>}
-              {!currentUser && <MenuItem key="SSOGithub" disabled={true} onClick={() => signInWithGoogle().then(handleCloseUserMenu)}>
+              {!currentUser && <MenuItem key="SSOGithub" onClick={() => signInWithGitHub().then(handleCloseUserMenu)}>
                 <GitHubIcon />
                 <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with GitHub</Typography>
+              </MenuItem>}
+              {!currentUser && <MenuItem key="SSOTwitter" onClick={() => signInWithTwitter().then(handleCloseUserMenu)}>
+                <TwitterIcon />
+                <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with Twitter</Typography>
               </MenuItem>}
             </Menu>
           </Box>
