@@ -32,6 +32,26 @@ function App() {
   }, [prefersDarkMode]);
 
   useEffect(() => {
+    //default to intraInstrument ON in the case of just one instument in the model
+    if (fileInfos.length ==1 && resultsOptions.intraInstrument == false) {
+      var newResultsOptions = {...resultsOptions};
+      newResultsOptions.intraInstrument = true;
+      newResultsOptions.intraInstrumentPreviousState = resultsOptions.intraInstrument;
+      setResultsOptions(newResultsOptions);
+    }
+
+    // If there is now more than 1 switch it back to what it was before we forced it.
+    if (fileInfos.length > 1 && typeof (resultsOptions.intraInstrumentPreviousState) == "boolean") {
+      var newResultsOptions = {...resultsOptions};
+      newResultsOptions.intraInstrument = newResultsOptions.intraInstrumentPreviousState;
+      delete newResultsOptions.intraInstrumentPreviousState;
+      setResultsOptions(newResultsOptions);
+    }
+
+  }, [fileInfos]);
+
+
+  useEffect(() => {
     postData(process.env.REACT_APP_API_EXAMPLES).then((data) => {
       setExistingInstruments(data)
       console.log(data)
