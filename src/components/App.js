@@ -21,7 +21,7 @@ function App() {
   const [fileInfos, setFileInfos] = useState([]);
   const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
-  const [resultsOptions, setResultsOptions] = useState({ threshold: 70, intraInstrument: false });
+  const [resultsOptions, setResultsOptions] = useState({ threshold: [70,100], intraInstrument: false });
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [mode, setMode] = useState();
   const { storeHarmonisation } = useData();

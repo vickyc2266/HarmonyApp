@@ -69,7 +69,7 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
       return (apiData.instruments.map(instrument => {
         return instrument.questions.map(q => {
           return q.matches.reduce(function (a, e, i) {
-            if (Math.abs(e) >= (resultsOptions.threshold / 100) && (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx))
+            if (Math.abs(e) >= (resultsOptions.threshold[0] / 100) && Math.abs(e) <= (resultsOptions.threshold[1] / 100) && (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx))
               a.push({ qi: q.question_index, mqi: i + 1 + q.question_index, match: e, ignore: ignoredMatches.includes(q.question_index + "-" +  (i + 1 + q.question_index)) });
             return a;
           }, [])

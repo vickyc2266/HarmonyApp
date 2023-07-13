@@ -23,14 +23,14 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions, make
         </Typography></div>
         <Slider
           value={threshold}
-          min={30}
+          min={0}
           valueLabelDisplay="auto"
           onChange={(e, value) => {
             setThreshold(value);
           }}
           onChangeCommitted={(e, value) => {
             let thisOptions = { ...resultsOptions };
-            thisOptions.threshold = isNaN(value) ? 70 : value;
+            thisOptions.threshold = value;
             setResultsOptions(thisOptions)
           }}
         />
