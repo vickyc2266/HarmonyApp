@@ -1,23 +1,27 @@
 import React from "react"
-import { useTheme,  List, ListItem, Button, Popper, Fade, Paper, ListItemIcon, ListItemText, Typography } from '@mui/material'
+import { useTheme, List, ListItem, Button, Popper, Fade, Paper, ListItemIcon, ListItemText, Typography } from '@mui/material'
 
 
 import PopupState, { bindToggle, bindPopper } from "material-ui-popup-state"
 //import { fade } from "@material-ui/core/styles/colorManipulator"
-import {Facebook, Twitter, Reddit, Link, Share}  from "@mui/icons-material"
+import { Facebook, Twitter, Reddit, Link, Share, LinkedIn } from "@mui/icons-material"
 
 
-export default function DropdownShareButton({getShareLink}) {
+export default function DropdownShareButton({ getShareLink }) {
   const classes = useTheme()
   async function handleShare(e) {
     e.preventDefault()
     const target = e.currentTarget.id;
-    
+
     const ahref = await getShareLink();
     const encAhref = encodeURIComponent(ahref);
     var link
 
     switch (target) {
+      case "linkedin":
+        link = `https://www.linkedin.com/sharing/share-offsite/?url=${encAhref}`
+        open(link)
+        break
       case "facebook":
         link = `https://www.facebook.com/sharer/sharer.php?u=${encAhref}`
         open(link)
@@ -41,69 +45,84 @@ export default function DropdownShareButton({getShareLink}) {
     window.open(socialLink, "_blank")
   }
   return (
-      <PopupState variant="popper" popupId="demo-popup-popper">
-        {popupState => (
-          <div>
-            <Button
+    <PopupState variant="popper" popupId="demo-popup-popper">
+      {popupState => (
+        <div>
+          <Button
 
-              variant="contained"
-              {...bindToggle(popupState)}
-            >
-              <Share/>
-              <Typography> Share </Typography>
-            </Button>
-            <Popper {...bindPopper(popupState)} transition>
-              {({ TransitionProps }) => (
-                <Fade {...TransitionProps} timeout={350}>
-                  <Paper>
-                    <List dense={true} className={classes.paper}>
-                      <ListItem
-                        button
-                        id="facebook"
-                        onClick={handleShare}
-                      >
-                        <ListItemIcon>
-                          <Facebook />
-                        </ListItemIcon>
-                        <ListItemText primary="Facebook" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        id="twitter"
-                        onClick={handleShare}
-                      >
-                        <ListItemIcon>
-                          <Twitter />
-                        </ListItemIcon>
-                        <ListItemText primary="Twitter" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        id="reddit"
-                        onClick={handleShare}
-                      >
-                        <ListItemIcon>
-                          <Reddit />
-                        </ListItemIcon>
-                        <ListItemText primary="Reddit" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        id="copy"
-                        onClick={handleShare}
-                      >
-                        <ListItemIcon>
-                          <Link />
-                        </ListItemIcon>
-                        <ListItemText primary="Copy Link" />
-                      </ListItem>
-                    </List>
-                  </Paper>
-                </Fade>
-              )}
-            </Popper>
-          </div>
-        )}
-      </PopupState>
+            variant="contained"
+            {...bindToggle(popupState)}
+          >
+            <Share />
+            <Typography> Share </Typography>
+          </Button>
+          <Popper {...bindPopper(popupState)} transition>
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={350}>
+                <Paper>
+                  <List dense={true} className={classes.paper}>
+                    <ListItem
+                      button
+                      id="twitter"
+                      onClick={handleShare}
+                    >
+                      <ListItemIcon>
+                        <Twitter />
+                      </ListItemIcon>
+                      <ListItemText primary="Twitter" />
+                    </ListItem>
+                    
+                    
+                    <ListItem
+                      button
+                      id="linkedin"
+                      onClick={handleShare}
+                    >
+                      <ListItemIcon>
+                        <LinkedIn />
+                      </ListItemIcon>
+                      <ListItemText primary="LinkedIn" />
+                    </ListItem>
+                    
+                    <ListItem
+                      button
+                      id="facebook"
+                      onClick={handleShare}
+                    >
+                      <ListItemIcon>
+                        <Facebook />
+                      </ListItemIcon>
+                      <ListItemText primary="Facebook" />
+                    </ListItem>
+                    
+                    <ListItem
+                      button
+                      id="reddit"
+                      onClick={handleShare}
+                    >
+
+                      <ListItemIcon>
+                        <Reddit />
+                      </ListItemIcon>
+                      <ListItemText primary="Reddit" />
+                    </ListItem>
+                    <ListItem
+                      button
+                      id="copy"
+                      onClick={handleShare}
+                    >
+                      <ListItemIcon>
+                        <Link />
+                      </ListItemIcon>
+                      <ListItemText primary="Copy Link" />
+                    </ListItem>
+                  </List>
+                </Paper>
+              </Fade>
+            )}
+          </Popper>
+        </div>
+      )}
+    </PopupState>
   )
 }

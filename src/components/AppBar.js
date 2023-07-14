@@ -6,10 +6,10 @@ import ThemeToggle from './ThemeToggle';
 import GoogleIcon from '@mui/icons-material/Google'
 import GitHubIcon from '@mui/icons-material/GitHub';
 import TwitterIcon from '@mui/icons-material/Twitter';
-const settings = ['My harmonizations', 'Logout'];
+const settings = ['My Harmony', 'Logout'];
 
 const SettingsIcons = {
-  'My harmonizations': <JoinInner />,
+  'My Harmony': <JoinInner />,
   'Logout': <Logout />
 }
 function HarmonyAppBar() {
@@ -98,7 +98,10 @@ function HarmonyAppBar() {
                   <Typography textAlign="center" sx={{ pl: 1 }}>{setting}</Typography>
                 </MenuItem>
               ))}
-              {!currentUser && <Divider />}
+              {!currentUser && [<Divider />,
+              <p style={{margin: '0 0.5rem', textAlign: 'center'}}>Signing in with one of the OAuth providers below allows you access to My Harmony where you can save and share your harmonisations.</p>
+              ]
+              } 
               {!currentUser && <MenuItem key="SSOGoogle" onClick={() => signInWithGoogle().then(handleCloseUserMenu)}>
                 <GoogleIcon />
                 <Typography textAlign="center" sx={{ pl: 1 }}>Sign in with Google</Typography>

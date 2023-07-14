@@ -123,7 +123,8 @@ function App() {
     const exportedData = apiData.instruments.map(instrument=>{
       return instrument.questions.map(q=>{
         return q.matches.reduce(function (a, e, i) {
-          if (Math.abs(e) >= (resultsOptions.threshold/100) && 
+          if (Math.abs(e) >= (resultsOptions.threshold[0]/100) && 
+              Math.abs(e) <= (resultsOptions.threshold[1]/100) && 
               (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx )) {
             var mq = getQuestion(i + 1 + q.question_index);
             var mi = mq.instrument;
