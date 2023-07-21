@@ -87,7 +87,7 @@ function App() {
     return new Promise((resolve, reject) => {
       storeHarmonisation(h).then((doc) => {
         console.log(doc)
-        resolve(window.location.origin + "/app/#/model/" + doc.id);
+        resolve(window.location.origin + "/#/model/" + doc.id);
       }).catch(e => {
         console.log(e)
         reject("Could not create share link")
