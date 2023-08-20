@@ -259,11 +259,11 @@ function App() {
                       match.
                     </p>
                     <p>
-                      <a href="https://harmonydata.org/frequently-asked-questions">
+                      <a href="https://harmonydata.ac.uk/frequently-asked-questions" style="color:white">
                         FAQs
                       </a>{" "}
                       -{" "}
-                      <a href="https://harmonydata.org/privacy-policy">
+                      <a href="https://harmonydata.ac.uk/privacy-policy" style="color:white">
                         Privacy policy
                       </a>
                     </p>
