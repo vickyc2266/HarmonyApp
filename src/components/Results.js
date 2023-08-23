@@ -95,7 +95,7 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
     })[0]
   }
   return (
-    <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding:{xs:"1rem 0.5rem  0 0.5rem", sx: "1rem 1rem  0 1rem"} }}>
+    <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding:{xs:"1rem 0.5rem  0 0.5rem", sx: "1rem 1rem  0 1rem",md: "1rem 1rem  0 1rem",lg: "1rem 1rem  0 1rem"} }}>
       <ToastContainer />
       {(savedError) && <AlertDialogSlide title="No Data!" message={"This harmonisation could not be loaded, if you have followed a sharing link this may have been disabled. Why not make one of your own?"} initialState={true} />}
       <InlineFeedback message="Only the first 500 matches are shown, you may use Export to see them all" severity="warning" state={computedMatches && computedMatches.length >500} />
