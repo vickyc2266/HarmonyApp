@@ -5,7 +5,14 @@ export const getDesignTokens = (mode) => ({
     body1: {
       fontFamily: "Pragmatica, sans-serif",
       fontWeight: 300,
-      lineHeight: "1.3",
+      lineHeight: "150%",
+      fontSize: "0.9rem",
+      "@media (min-width:600px)":{
+        fontSize: "1rem",
+      },
+      "@media (min-width:900px)":{
+        fontSize: "1.1rem",
+      }
     },
     caption: {
       fontFamily: "Pragmatica, sans-serif",

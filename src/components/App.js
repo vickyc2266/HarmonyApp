@@ -259,11 +259,11 @@ function App() {
                       match.
                     </p>
                     <p>
-                      <a href="https://harmonydata.ac.uk/frequently-asked-questions">
+                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/frequently-asked-questions">
                         FAQs
                       </a>{" "}
                       -{" "}
-                      <a href="https://harmonydata.ac.uk/privacy-policy">
+                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/privacy-policy">
                         Privacy policy
                       </a>
                     </p>
@@ -288,7 +288,7 @@ function App() {
                   paddingTop: { md: "4rem" },
                   overflow: "auto",
                   padding: useMediaQuery(theme.breakpoints.only("xs"))
-                    ? "1rem"
+                    ? "0.5rem"
                     : "2rem",
                 }}
               >

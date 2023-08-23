@@ -15,7 +15,7 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions, make
   },[resultsOptions])
 
   return (
-    <Card sx={{ display: "flex", flexDirection: "column", width: "75%", margin: "auto", padding: "1rem" }}>
+    <Card sx={{ display: "flex", flexDirection: "column", width: {xs:"100%", sm:"75%"}, margin: "auto", padding: "1rem" }}>
       <h2 style={{ marginTop: 0 }}>Options</h2>
       <Stack>
         <div><Typography id="Threshold">
