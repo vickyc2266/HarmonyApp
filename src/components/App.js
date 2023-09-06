@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, Box, Slide, useMediaQuery } from "@mui/material";
+import { Container, Box, Slide, useMediaQuery, Link } from "@mui/material";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import Upload from "./Upload";
 import Results from "./Results";
@@ -20,6 +20,7 @@ import { ColorModeContext } from "../contexts/ColorModeContext";
 import postData from "../utilities/postData";
 import { useData } from "../contexts/DataContext";
 import { utils as XLSXutils, writeFile as XLSXwriteFile } from "xlsx";
+import ReactGA from 'react-ga4';
 
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
@@ -27,11 +28,14 @@ function App() {
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({
     threshold: [70, 100],
+    searchTerm: "",
     intraInstrument: false,
   });
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [mode, setMode] = useState();
   const { storeHarmonisation } = useData();
+
+  ReactGA.initialize("G-S79J6E39ZP");
 
   useEffect(() => {
     setMode(prefersDarkMode ? "dark" : "light");
@@ -145,7 +149,8 @@ function App() {
                 Math.abs(e) >= resultsOptions.threshold[0] / 100 &&
                 Math.abs(e) <= resultsOptions.threshold[1] / 100 &&
                 (resultsOptions.intraInstrument ||
-                  i + 1 + q.question_index > instrument.maxqidx)
+                  i + 1 + q.question_index > instrument.maxqidx) &&
+                (!resultsOptions.searchTerm || (q.question_text.concat(q.topics_auto).toLowerCase().includes(resultsOptions.searchTerm.toLowerCase()) || getQuestion(i + 1 + q.question_index).question_text.concat(getQuestion(i + 1 + q.question_index).topics_auto).toLowerCase().includes(resultsOptions.searchTerm)))
               ) {
                 var mq = getQuestion(i + 1 + q.question_index);
                 var mi = mq.instrument;
@@ -201,8 +206,8 @@ function App() {
           disableGutters={true}
           //
           sx={{
-            display: { md: "flex", sm: "block" },
-            flexDirection: useMediaQuery(theme.breakpoints.down("md"))
+            display: { lg: "flex", md: "block" },
+            flexDirection: useMediaQuery(theme.breakpoints.down("lg"))
               ? "column"
               : "row",
             justifyContent: "center",
@@ -218,11 +223,11 @@ function App() {
               sx={{
                 display: "flex",
                 boxSizing: "border-box",
-                width: { md: "50%", sm: "100%" },
+                width: { lg: "50%", md: "100%" },
                 top: 0,
                 marginLeft: 0,
                 marginRight: "auto",
-                height: { md: "100%", sm: "unset" },
+                height: { lg: "100%", md: "unset" },
                 background: "linear-gradient(-135deg,#0de5b2, #2b45ed)",
                 backgroundImage: `linear-gradient(-135deg,#0de5b2DD, #2b45edAA), url(${pattern}), linear-gradient(-135deg,#0de5b2, #2b45ed)`,
                 backgroundSize: "cover",
@@ -233,7 +238,10 @@ function App() {
                 color: "white",
               }}
             >
-              <img src={logoWithText} alt="Harmony Logo" />
+              <Link href="#" sx={{ width: "80%", maxWidth: 700, mx: "auto" }} >
+                <img src={logoWithText} alt="Harmony Logo" />
+              </Link>
+
               <Switch>
                 <Route path="/model/:stateHash?">
                   <ResultsOptions
@@ -242,6 +250,7 @@ function App() {
                     makePublicShareLink={makePublicShareLink}
                     saveToMyHarmony={saveToMyHarmony}
                     downloadExcel={downloadExcel}
+                    ReactGA={ReactGA}
                   />
                 </Route>
                 <Route path="*">
@@ -271,7 +280,7 @@ function App() {
                 </Route>
               </Switch>
 
-              <Box sx={{ display: { md: "block", sm: "none", xs: "none" } }}>
+              <Box sx={{ display: { lg: "block", md: "none", sm: "none", xs: "none" } }}>
                 <img
                   src={logoWithText}
                   style={{ visibility: "hidden" }}
@@ -283,9 +292,9 @@ function App() {
             <Slide in={true} direction="up">
               <Box
                 sx={{
-                  width: { md: "50%", sm: "100%" },
-                  maxHeight: { md: "100%" },
-                  paddingTop: { md: "4rem" },
+                  width: { lg: "50%", md: "100%" },
+                  maxHeight: { lg: "100%" },
+                  paddingTop: { lg: "4rem" },
                   overflow: "auto",
                   padding: useMediaQuery(theme.breakpoints.only("xs"))
                     ? "0.5rem"
@@ -305,6 +314,7 @@ function App() {
                       setApiData={setApiData}
                       setResultsOptions={setResultsOptions}
                       resultsOptions={resultsOptions}
+                      ReactGA={ReactGA}
                     />
                   </Route>
                   <Route path="*">
@@ -313,6 +323,7 @@ function App() {
                       setFileInfos={setFileInfos}
                       setApiData={setApiData}
                       existingInstruments={existingInstruments}
+                      ReactGA={ReactGA}
                     />
                   </Route>
                 </Switch>

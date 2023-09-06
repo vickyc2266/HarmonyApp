@@ -11,13 +11,13 @@ import { simplifyApi } from "../utilities/simplifyApi";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function Upload({ fileInfos, setFileInfos, setApiData, existingInstruments }) {
+export default function Upload({ fileInfos, setFileInfos, setApiData, existingInstruments, ReactGA }) {
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
   const [grouping, setGrouping] = useState("");
   const history = useHistory()
-
+  ReactGA.send({ hitType: "pageview", page: "/", title: "Upload / Definition" });
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
     let frp = [];
@@ -40,28 +40,28 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
     });
     Promise.all(frp).then((allFiles) => {
       toast.promise(
-        new Promise((resolve, reject) => { 
+        new Promise((resolve, reject) => {
           postData(process.env.REACT_APP_API_PARSE, allFiles, 15000).then((data) => {
-        const newFileInfos = [...fileInfos]
-        // Load each returned file / instrument in the data 
-        data.forEach(instrument => {
-          newFileInfos.push(instrument);
-        })
-        setFileInfos(newFileInfos)
-        resolve(true);
-      }).catch(e => {
-        console.log(e)
-        setParseError(true);
-        reject("Parse Error")
-      });
-    }),
-     {
-       pending: 'Parsing files - this may take a while',
-       success: 'Success!',
-       error: 'Something went wrong - please try again'
-     }
-     )
-     
+            const newFileInfos = [...fileInfos]
+            // Load each returned file / instrument in the data 
+            data.forEach(instrument => {
+              newFileInfos.push(instrument);
+            })
+            setFileInfos(newFileInfos)
+            resolve(true);
+          }).catch(e => {
+            console.log(e)
+            setParseError(true);
+            reject("Parse Error")
+          });
+        }),
+        {
+          pending: 'Parsing files - this may take a while',
+          success: 'Success!',
+          error: 'Something went wrong - please try again'
+        }
+      )
+
     });
   }
 
@@ -74,27 +74,27 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
     });
 
     // trim out any which are existing instruments but not selected
-    newFileInfos = newFileInfos.map((fi) =>{
+    newFileInfos = newFileInfos.map((fi) => {
       if ((existingInstrumentIDs.includes(fi.instrument_id) && selected.includes(fi.instrument_name)) ||
-         (!existingInstrumentIDs.includes(fi.instrument_id))) {
+        (!existingInstrumentIDs.includes(fi.instrument_id))) {
         return fi;
-         }
-    }).filter(i=>{return i});
+      }
+    }).filter(i => { return i });
 
     // add in any selected which are not already in there
-    selected.forEach(sin=>{
-      let si =  existingInstruments.filter(
+    selected.forEach(sin => {
+      let si = existingInstruments.filter(
         (inst) => { return inst.instrument_name === sin }
       )[0];
       si.grouping = grouping;
-      if(newFileInfos.filter((inst)=> {
+      if (newFileInfos.filter((inst) => {
         return inst.instrument_id === si.instrument_id;
       }).length === 0) {
         console.log("adding " + si.instrument_name)
         newFileInfos.push(si)
       }
     })
-  
+
     setFileInfos(newFileInfos)
   }
 
@@ -159,7 +159,7 @@ export default function Upload({ fileInfos, setFileInfos, setApiData, existingIn
 
   return (
     <Paper elevation={4} sx={{ display: "flex", flexDirection: "column", width: "100%", padding: "1rem" }}>
-      <ToastContainer/>
+      <ToastContainer />
       <InlineFeedback message="The file could not be parsed" severity="error" state={parseError} setState={setParseError} />
       <InlineFeedback message="The match proceedure failed" severity="error" state={matchError} setState={setMatchError} />
 

@@ -7,15 +7,20 @@ import PopupState, { bindToggle, bindPopper } from "material-ui-popup-state"
 import { Facebook, Twitter, Reddit, Link, Share, LinkedIn } from "@mui/icons-material"
 
 
-export default function DropdownShareButton({ getShareLink }) {
+export default function DropdownShareButton({ getShareLink, ReactGA }) {
   const classes = useTheme()
   async function handleShare(e) {
     e.preventDefault()
     const target = e.currentTarget.id;
 
+
     const ahref = await getShareLink();
     const encAhref = encodeURIComponent(ahref);
     var link
+    ReactGA.event('share', {
+      item_id: ahref,
+      method: target
+    })
 
     switch (target) {
       case "linkedin":
@@ -71,8 +76,8 @@ export default function DropdownShareButton({ getShareLink }) {
                       </ListItemIcon>
                       <ListItemText primary="Twitter" />
                     </ListItem>
-                    
-                    
+
+
                     <ListItem
                       button
                       id="linkedin"
@@ -83,7 +88,7 @@ export default function DropdownShareButton({ getShareLink }) {
                       </ListItemIcon>
                       <ListItemText primary="LinkedIn" />
                     </ListItem>
-                    
+
                     <ListItem
                       button
                       id="facebook"
@@ -94,7 +99,7 @@ export default function DropdownShareButton({ getShareLink }) {
                       </ListItemIcon>
                       <ListItemText primary="Facebook" />
                     </ListItem>
-                    
+
                     <ListItem
                       button
                       id="reddit"
