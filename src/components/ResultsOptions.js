@@ -35,7 +35,7 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions, make
           }}
         />
         <Divider sx={{ mt: 1, mb: 1 }} />
-        <TextField sx={{ mt: 1, mb: 1 }} id="outlined-basic" label="Search" autoComplete={false} onChange={(e) => {
+        <TextField sx={{ mt: 1, mb: 1 }} id="outlined-basic" label="Search" autoComplete='off' onChange={(e) => {
           let thisOptions = { ...resultsOptions };
           thisOptions.searchTerm = e.target.value;
 
@@ -59,7 +59,7 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions, make
         <Stack direction="row" sx={{ width: "100%", alignItems: "center", justifyContent: "space-around" }} >
           {currentUser && <DropdownShareButton getShareLink={makePublicShareLink} ReactGA={ReactGA} />}
           <Button variant="contained" onClick={() => {
-            ReactGA.event({
+            ReactGA && ReactGA.event({
               category: "Actions",
               action: "Export Matches"
             })

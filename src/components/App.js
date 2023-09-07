@@ -21,6 +21,7 @@ import postData from "../utilities/postData";
 import { useData } from "../contexts/DataContext";
 import { utils as XLSXutils, writeFile as XLSXwriteFile } from "xlsx";
 import ReactGA from 'react-ga4';
+import CookieConsent from "react-cookie-consent";
 
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
@@ -35,7 +36,7 @@ function App() {
   const [mode, setMode] = useState();
   const { storeHarmonisation } = useData();
 
-  ReactGA.initialize("G-S79J6E39ZP");
+
 
   useEffect(() => {
     setMode(prefersDarkMode ? "dark" : "light");
@@ -330,6 +331,22 @@ function App() {
               </Box>
             </Slide>
           </Router>
+
+          <CookieConsent
+            acceptOnScroll={false}
+            location="bottom"
+            buttonText="That's fine"
+            cookieName="harmonyCookieConsent"
+            style={{ background: "#2B373B" }}
+            buttonStyle={{ color: "#4e503b", fontSize: "13px" }}
+            expires={150}
+            onAccept={() => {
+              ReactGA.initialize("G-S79J6E39ZP");
+            }}
+          >
+            This website uses analytics cookies to allow us to improve the user experience.{" "}
+
+          </CookieConsent>
         </Container>
       </ThemeProvider>
     </ColorModeContext.Provider>
