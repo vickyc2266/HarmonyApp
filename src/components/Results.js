@@ -105,7 +105,7 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
       {(savedError) && <AlertDialogSlide title="No Data!" message={"This harmonisation could not be loaded, if you have followed a sharing link this may have been disabled. Why not make one of your own?"} initialState={true} />}
       <InlineFeedback message="Only the first 500 matches are shown, you may use Export to see them all" severity="warning" state={computedMatches && computedMatches.length > 500} />
       <InlineFeedback message="No matches - try lowering your threshold" severity="warning" state={computedMatches && computedMatches.length === 0} />
-      <InlineFeedback message={"Found " + computedMatches.length + " matches"} severity="info" state={computedMatches && computedMatches.length > 0 && computedMatches.length < 501} />
+      {computedMatches && <InlineFeedback message={"Found " + computedMatches.length + " matches"} severity="info" state={computedMatches && computedMatches.length > 0 && computedMatches.length < 501} />}
       {computedMatches && computedMatches.slice(0, 500).map(i => {
         return (
           (!i.ignore) &&
