@@ -48,6 +48,14 @@ export function DataProvider({ children }) {
     }
   };
 
+  const reportRating = async (rating) => {
+    let r = {};
+    r.uid = currentUser ? currentUser.uid : "anon";
+    r.rating = rating;
+    r.created = serverTimestamp();
+    return addDoc(collection(db, "ratings"), r);
+  }
+
   const getMyHarmonisations = async () => {
     const q = query(
       collection(db, "harmonisations"),
@@ -89,6 +97,7 @@ export function DataProvider({ children }) {
   };
 
   const reportMisMatch = async (mismatch) => {
+    console.log(mismatch);
     var q1 = { ...mismatch.q1 };
     var q2 = { ...mismatch.q2 };
     var m = { q1: q1, q2: q2 };
@@ -98,8 +107,11 @@ export function DataProvider({ children }) {
     m.q2.instrument_name = m.q2.instrument.name;
     m.q1.instrument_id = m.q1.instrument.id;
     m.q2.instrument_id = m.q2.instrument.id;
+    m.match_reported = mismatch.match
     delete m.q1.instrument;
     delete m.q2.instrument;
+    delete m.q1.nearest_match_from_mhc_auto
+    delete m.q2.nearest_match_from_mhc_auto
     m.created = serverTimestamp();
 
     return addDoc(collection(db, "mismatches"), m);
@@ -136,6 +148,7 @@ export function DataProvider({ children }) {
         getPublicHarmonisations,
         reportMisMatch,
         prepForFireStore,
+        reportRating
       }}
     >
       {children}

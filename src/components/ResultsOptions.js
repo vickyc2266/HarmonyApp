@@ -1,18 +1,28 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Divider, Card, Slider, Switch, Typography, Stack, Button, TextField } from '@mui/material'
 import { ReactComponent as xlsxSVG } from "../img/file-excel-solid.svg"
 import DropdownShareButton from "./DropdownShareButton";
 import SvgIcon from '@mui/material/SvgIcon';
 import { useAuth } from "../contexts/AuthContext"
+import { useDebounce } from 'react-use-custom-hooks';
 
-
-export default function ResultsOptions({ resultsOptions, setResultsOptions, makePublicShareLink, saveToMyHarmony, downloadExcel, ReactGA }) {
+export default function ResultsOptions({ resultsOptions, setResultsOptions, makePublicShareLink, saveToMyHarmony, downloadExcel, ReactGA, toaster }) {
   const [threshold, setThreshold] = useState(resultsOptions.threshold);
   const { currentUser } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("")
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
     setThreshold(resultsOptions.threshold);
+    setSearchTerm(resultsOptions.searchTerm);
   }, [resultsOptions])
+
+
+  useMemo(() => {
+    let thisOptions = { ...resultsOptions };
+    thisOptions.searchTerm = debouncedSearchTerm;
+    setResultsOptions(thisOptions);
+  }, [debouncedSearchTerm])
 
   return (
     <Card sx={{ display: "flex", flexDirection: "column", width: { xs: "100%", sm: "75%" }, margin: "auto", padding: "1rem" }}>
@@ -35,12 +45,19 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions, make
           }}
         />
         <Divider sx={{ mt: 1, mb: 1 }} />
-        <TextField sx={{ mt: 1, mb: 1 }} id="outlined-basic" label="Search" autoComplete='off' onChange={(e) => {
-          let thisOptions = { ...resultsOptions };
-          thisOptions.searchTerm = e.target.value;
-
-          setResultsOptions(thisOptions);
-        }} value={resultsOptions.searchTerm} variant="outlined" />
+        <TextField
+          sx={{ mt: 1, mb: 1 }}
+          id="outlined-basic"
+          label="Search"
+          autoComplete='off'
+          inputProps={{
+            autoComplete: "off"
+          }}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+          value={searchTerm}
+          variant="outlined" />
         <Divider sx={{ mt: 1, mb: 1 }} />
         <Stack direction="row" sx={{ width: "100%", alignItems: "center", justifyContent: "space-between" }} >
           <Typography id="withinInstruments">
@@ -51,6 +68,19 @@ export default function ResultsOptions({ resultsOptions, setResultsOptions, make
             onChange={(e, value) => {
               let thisOptions = { ...resultsOptions };
               thisOptions.intraInstrument = value;
+              setResultsOptions(thisOptions);
+            }}
+          />
+        </Stack>
+        <Stack direction="row" sx={{ width: "100%", alignItems: "center", justifyContent: "space-between" }} >
+          <Typography id="withinInstruments">
+            Just selected matches
+          </Typography>
+          <Switch
+            checked={resultsOptions.onlySelected}
+            onChange={(e, value) => {
+              let thisOptions = { ...resultsOptions };
+              thisOptions.onlySelected = value;
               setResultsOptions(thisOptions);
             }}
           />

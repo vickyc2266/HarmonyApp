@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, Box, Slide, useMediaQuery, Link } from "@mui/material";
+import { Container, Box, Slide, useMediaQuery, Link, Typography, Rating } from "@mui/material";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import Upload from "./Upload";
 import Results from "./Results";
@@ -22,6 +22,8 @@ import { useData } from "../contexts/DataContext";
 import { utils as XLSXutils, writeFile as XLSXwriteFile } from "xlsx";
 import ReactGA from 'react-ga4';
 import CookieConsent from "react-cookie-consent";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
@@ -34,8 +36,9 @@ function App() {
   });
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const [mode, setMode] = useState();
-  const { storeHarmonisation } = useData();
-
+  const { storeHarmonisation, reportRating } = useData();
+  const [ratingValue, setRatingValue] = useState();
+  const [computedMatches, setComputedMatches] = useState();
 
 
   useEffect(() => {
@@ -101,7 +104,6 @@ function App() {
     h.apiData = apiData;
     h.resultsOptions = resultsOptions;
     h.public = true;
-
     return new Promise((resolve, reject) => {
       storeHarmonisation(h)
         .then((doc) => {
@@ -115,7 +117,44 @@ function App() {
     });
   };
 
+  const ratingToast = () => {
+
+    if (!document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("harmonyHasRated"))) {
+      toast(
+        <Box>
+          <Typography component="legend">Are you enjoying Harmony?</Typography>
+          <Box><Rating
+            name="simple-controlled"
+            value={ratingValue}
+            onChange={(event, newValue) => {
+              console.log(newValue);
+              setRatingValue(newValue);
+              reportRating(newValue);
+              document.cookie =
+                "harmonyHasRated=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=None; Secure";
+              ReactGA && ReactGA.event({
+                category: "Actions",
+                action: "Rating",
+                value: Number(newValue)
+              })
+            }}
+          />
+          </Box>
+        </Box>, {
+        autoClose: false
+      });
+
+
+
+    }
+
+
+  }
+
   const saveToMyHarmony = () => {
+    setTimeout(ratingToast, 1000)
     let h = {};
     h.apiData = JSON.parse(JSON.stringify(apiData));
     h.resultsOptions = resultsOptions;
@@ -133,49 +172,26 @@ function App() {
     });
   };
 
+
   const downloadExcel = () => {
-    var ignoredMatches = [];
-    if (Object.keys(apiData).includes("ignoredMatches")) {
-      ignoredMatches = apiData.ignoredMatches;
-      ignoredMatches = ignoredMatches.map((im) => {
-        return im.q1.question_index + "-" + im.q2.question_index;
+    setTimeout(ratingToast, 1000)
+
+    const matchSheet = computedMatches.reduce(function (a, cm, i) {
+      let q = getQuestion(cm.qi)
+      let mq = getQuestion(cm.mqi)
+      a.push({
+        instrument1: q.instrument.name,
+        question1_no: q.question_no,
+        question1_text: q.question_text,
+        question1_topics: q.topics_auto.toString(),
+        instrument2: mq.instrument.name,
+        question2_no: mq.question_no,
+        question2_text: mq.question_text,
+        question2_topics: mq.topics_auto.toString(),
+        match: cm.match,
       });
-    }
-    const exportedData = apiData.instruments
-      .map((instrument) => {
-        return instrument.questions
-          .map((q) => {
-            return q.matches.reduce(function (a, e, i) {
-              if (
-                Math.abs(e) >= resultsOptions.threshold[0] / 100 &&
-                Math.abs(e) <= resultsOptions.threshold[1] / 100 &&
-                (resultsOptions.intraInstrument ||
-                  i + 1 + q.question_index > instrument.maxqidx) &&
-                (!resultsOptions.searchTerm || (q.question_text.concat(q.topics_auto).toLowerCase().includes(resultsOptions.searchTerm.toLowerCase()) || getQuestion(i + 1 + q.question_index).question_text.concat(getQuestion(i + 1 + q.question_index).topics_auto).toLowerCase().includes(resultsOptions.searchTerm)))
-              ) {
-                var mq = getQuestion(i + 1 + q.question_index);
-                var mi = mq.instrument;
-                var ignore = ignoredMatches.includes(
-                  q.question_index + "-" + (i + 1 + q.question_index)
-                );
-                a.push({
-                  instrument1: instrument.name,
-                  question1_no: q.question_no,
-                  question1_text: q.question_text,
-                  question1_topics: q.topics_auto.toString(),
-                  instrument2: mi.name,
-                  question2_no: mq.question_no,
-                  question2_text: mq.question_text,
-                  question2_topics: mq.topics_auto.toString(),
-                  match: e,
-                  flagged_as_ignore: ignore,
-                });
-              }
-              return a;
-            }, []);
-          })
-          .flat();
-      })
+      return a;
+    }, [])
       .flat()
       .sort((a, b) => {
         if (Math.abs(a.match) < Math.abs(b.match)) {
@@ -186,9 +202,40 @@ function App() {
         }
         return 0;
       });
-    const worksheet = XLSXutils.json_to_sheet(exportedData);
+    const allQs = apiData.instruments
+      .map((i) => {
+        return i.questions;
+      })
+      .flat().sort((a, b) => {
+        if (a.question_index > b.question_index) {
+          return 1;
+        }
+        if (a.question_index < b.question_index) {
+          return -1;
+        }
+        return 0;
+      });
+
+    const headers = allQs.map(q => {
+      return q.instrument.name + ' ' + q.question_no
+    });
+    const subheaders = allQs.map(q => {
+      return q.question_text
+    });
+
+    const matrixSheet = allQs.map((q, i) => {
+      return Array(i + 1).concat(q.matches);
+    });
+    matrixSheet.unshift(subheaders)
+    matrixSheet.unshift(headers)
+
+
+
+    const matches = XLSXutils.json_to_sheet(matchSheet);
+    const matrix = XLSXutils.aoa_to_sheet(matrixSheet);
     const workbook = XLSXutils.book_new();
-    XLSXutils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSXutils.book_append_sheet(workbook, matches, "Matches");
+    XLSXutils.book_append_sheet(workbook, matrix, "Matrix");
     XLSXwriteFile(workbook, "Harmony.xlsx");
   };
 
@@ -218,6 +265,7 @@ function App() {
             maxWidth: "100%!important",
           }}
         >
+          <ToastContainer theme={theme.palette.mode} />
           <Router>
             {/* Side bar for wide screens - narrow screens at top of screen and only on upload page*/}
             <Box
@@ -251,6 +299,7 @@ function App() {
                     makePublicShareLink={makePublicShareLink}
                     saveToMyHarmony={saveToMyHarmony}
                     downloadExcel={downloadExcel}
+                    toaster={toast}
                     ReactGA={ReactGA}
                   />
                 </Route>
@@ -315,6 +364,8 @@ function App() {
                       setApiData={setApiData}
                       setResultsOptions={setResultsOptions}
                       resultsOptions={resultsOptions}
+                      toaster={toast}
+                      reportComputedMatches={setComputedMatches}
                       ReactGA={ReactGA}
                     />
                   </Route>
