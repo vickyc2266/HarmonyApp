@@ -41,6 +41,7 @@ function App() {
   const [computedMatches, setComputedMatches] = useState();
 
 
+
   useEffect(() => {
     setMode(prefersDarkMode ? "dark" : "light");
   }, [prefersDarkMode]);
@@ -341,6 +342,7 @@ function App() {
             <HarmonyAppBar></HarmonyAppBar>
             <Slide in={true} direction="up">
               <Box
+
                 sx={{
                   width: { lg: "50%", md: "100%" },
                   maxHeight: { lg: "100%" },

@@ -14,7 +14,12 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import { useTheme } from "@emotion/react";
 
+
+
 const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
+  //const [localSelected, setLocalSelected] = useState(selected);
+  performance.mark(Q1.question_index + "_" + Q2.question_index + ' start');
+
   const theme = useTheme()
   // const [isFlipped, setIsFlipped] = useState(false);
   const [menuElement, setMenuElement] = useState(null);
@@ -30,7 +35,7 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
   };
 
   const flipMe = (e) => {
-    //setIsFlipped(!isFlipped);
+    //setLocalSelected(!localSelected);
     matchUnitMenuAction({ q1: Q1, q2: Q2, action: "select" });
   };
 
@@ -40,6 +45,7 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
       onClick={flipMe}
       elevation={selected ? 5 : 0}
       sx={{
+        contentVisibility: 'auto',
         cursor: "pointer",
         display: "flex",
         width: "100%",
@@ -72,7 +78,7 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
           {Q1.instrument && Q1.instrument.name} - Q{Q1.question_no}
         </Typography>
       </Box>
-      <Box sx={{ width: "4em", margin: "0.5rem" }}>
+      <Box sx={{ width: "4em", margin: "0.5rem", padding: "1px" }}>
         <MatchCircle percentage={percentage} />
       </Box>
       <Box
@@ -207,6 +213,6 @@ const MatchUnit = ({ Q1, Q2, percentage, matchUnitMenuAction, selected }) => {
      </Card>
    </ReactCardFlip> */
   );
-};
+}
 
 export default MatchUnit;
