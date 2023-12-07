@@ -23,6 +23,23 @@ This is the app in React which is running at https://harmonydata.ac.uk/app. It i
 * 🪧 The Harmony R library source code is here: https://github.com/harmonydata/harmony_r.
 * 🪧 The Harmony API source code is here: https://github.com/harmonydata/harmonyapi.
 
+## How to run Harmony's Node.js front end.
+
+First you need the [API server](https://github.com/harmonydata/harmonyapi) running. Download, install and start the Harmony API. The Node.js front end will connect to the API server.
+
+Follow the steps to install [Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+Then `cd` into this cloned folder (`cd app`) and run:
+
+```
+npm install
+npm start
+```
+
+You can access Harmony in your browser at `http://localhost:3000/app#/`.
+
+![screenshot](https://harmonydata.ac.uk/images/localhost-min.png)
+
 ## Who to contact?
 
 You can contact Harmony team at https://harmonydata.ac.uk/, Thomas Wood at http://fastdatascience.com/ or John Rogers at http://delosis.com
