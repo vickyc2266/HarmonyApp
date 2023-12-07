@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, Box, Slide, useMediaQuery, Link, Typography, Rating } from "@mui/material";
+import {
+  Container,
+  Box,
+  Slide,
+  useMediaQuery,
+  Link,
+  Typography,
+  Rating,
+} from "@mui/material";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import Upload from "./Upload";
 import Results from "./Results";
@@ -20,13 +28,19 @@ import { ColorModeContext } from "../contexts/ColorModeContext";
 import postData from "../utilities/postData";
 import { useData } from "../contexts/DataContext";
 import { utils as XLSXutils, writeFile as XLSXwriteFile } from "xlsx";
-import ReactGA from 'react-ga4';
+import ReactGA from "react-ga4";
 import CookieConsent from "react-cookie-consent";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const [fileInfos, setFileInfos] = useState([]);
+  const [fileInfos, setFileInfos] = useState([
+    {
+      instrument_id: String(new Date().getTime()),
+      instrument_name: "",
+      questions: [{ question_no: "", question_text: "" }],
+    },
+  ]);
   const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({
@@ -39,7 +53,6 @@ function App() {
   const { storeHarmonisation, reportRating } = useData();
   const [ratingValue, setRatingValue] = useState();
   const [computedMatches, setComputedMatches] = useState();
-
 
   useEffect(() => {
     setMode(prefersDarkMode ? "dark" : "light");
@@ -118,43 +131,43 @@ function App() {
   };
 
   const ratingToast = () => {
-
-    if (!document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("harmonyHasRated"))) {
+    if (
+      !document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("harmonyHasRated"))
+    ) {
       toast(
         <Box>
           <Typography component="legend">Are you enjoying Harmony?</Typography>
-          <Box><Rating
-            name="simple-controlled"
-            value={ratingValue}
-            onChange={(event, newValue) => {
-              console.log(newValue);
-              setRatingValue(newValue);
-              reportRating(newValue);
-              document.cookie =
-                "harmonyHasRated=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=None; Secure";
-              ReactGA && ReactGA.event({
-                category: "Actions",
-                action: "Rating",
-                value: Number(newValue)
-              })
-            }}
-          />
+          <Box>
+            <Rating
+              name="simple-controlled"
+              value={ratingValue}
+              onChange={(event, newValue) => {
+                console.log(newValue);
+                setRatingValue(newValue);
+                reportRating(newValue);
+                document.cookie =
+                  "harmonyHasRated=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=None; Secure";
+                ReactGA &&
+                  ReactGA.event({
+                    category: "Actions",
+                    action: "Rating",
+                    value: Number(newValue),
+                  });
+              }}
+            />
           </Box>
-        </Box>, {
-        autoClose: false
-      });
-
-
-
+        </Box>,
+        {
+          autoClose: false,
+        }
+      );
     }
-
-
-  }
+  };
 
   const saveToMyHarmony = () => {
-    setTimeout(ratingToast, 1000)
+    setTimeout(ratingToast, 1000);
     let h = {};
     h.apiData = JSON.parse(JSON.stringify(apiData));
     h.resultsOptions = resultsOptions;
@@ -172,26 +185,26 @@ function App() {
     });
   };
 
-
   const downloadExcel = () => {
-    setTimeout(ratingToast, 1000)
+    setTimeout(ratingToast, 1000);
 
-    const matchSheet = computedMatches.reduce(function (a, cm, i) {
-      let q = getQuestion(cm.qi)
-      let mq = getQuestion(cm.mqi)
-      a.push({
-        instrument1: q.instrument.name,
-        question1_no: q.question_no,
-        question1_text: q.question_text,
-        question1_topics: q.topics_auto.toString(),
-        instrument2: mq.instrument.name,
-        question2_no: mq.question_no,
-        question2_text: mq.question_text,
-        question2_topics: mq.topics_auto.toString(),
-        match: cm.match,
-      });
-      return a;
-    }, [])
+    const matchSheet = computedMatches
+      .reduce(function (a, cm, i) {
+        let q = getQuestion(cm.qi);
+        let mq = getQuestion(cm.mqi);
+        a.push({
+          instrument1: q.instrument.name,
+          question1_no: q.question_no,
+          question1_text: q.question_text,
+          question1_topics: q.topics_auto.toString(),
+          instrument2: mq.instrument.name,
+          question2_no: mq.question_no,
+          question2_text: mq.question_text,
+          question2_topics: mq.topics_auto.toString(),
+          match: cm.match,
+        });
+        return a;
+      }, [])
       .flat()
       .sort((a, b) => {
         if (Math.abs(a.match) < Math.abs(b.match)) {
@@ -206,7 +219,8 @@ function App() {
       .map((i) => {
         return i.questions;
       })
-      .flat().sort((a, b) => {
+      .flat()
+      .sort((a, b) => {
         if (a.question_index > b.question_index) {
           return 1;
         }
@@ -216,20 +230,18 @@ function App() {
         return 0;
       });
 
-    const headers = allQs.map(q => {
-      return q.instrument.name + ' ' + q.question_no
+    const headers = allQs.map((q) => {
+      return q.instrument.name + " " + q.question_no;
     });
-    const subheaders = allQs.map(q => {
-      return q.question_text
+    const subheaders = allQs.map((q) => {
+      return q.question_text;
     });
 
     const matrixSheet = allQs.map((q, i) => {
       return Array(i + 1).concat(q.matches);
     });
-    matrixSheet.unshift(subheaders)
-    matrixSheet.unshift(headers)
-
-
+    matrixSheet.unshift(subheaders);
+    matrixSheet.unshift(headers);
 
     const matches = XLSXutils.json_to_sheet(matchSheet);
     const matrix = XLSXutils.aoa_to_sheet(matrixSheet);
@@ -272,7 +284,8 @@ function App() {
               sx={{
                 display: "flex",
                 boxSizing: "border-box",
-                width: { lg: "50%", md: "100%" },
+                width: { lg: "35%", md: "100%" },
+                minWidth: 300,
                 top: 0,
                 marginLeft: 0,
                 marginRight: "auto",
@@ -287,7 +300,7 @@ function App() {
                 color: "white",
               }}
             >
-              <Link href="#" sx={{ width: "80%", maxWidth: 700, mx: "auto" }} >
+              <Link href="#" sx={{ width: "80%", maxWidth: 700, mx: "auto" }}>
                 <img src={logoWithText} alt="Harmony Logo" />
               </Link>
 
@@ -318,19 +331,31 @@ function App() {
                       match.
                     </p>
                     <p>
-                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/frequently-asked-questions">
+                      <a
+                        style={{ color: "white" }}
+                        href="https://harmonydata.ac.uk/frequently-asked-questions"
+                      >
                         FAQs
                       </a>{" "}
                       -{" "}
-                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/privacy-policy">
+                      <a
+                        style={{ color: "white" }}
+                        href="https://harmonydata.ac.uk/privacy-policy"
+                      >
                         Privacy policy
-                      </a>
-                      {" "}-{" "}
-                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/formatting-help/">
+                      </a>{" "}
+                      -{" "}
+                      <a
+                        style={{ color: "white" }}
+                        href="https://harmonydata.ac.uk/formatting-help/"
+                      >
                         Help with formatting
-                      </a>
-                      {" "}-{" "}
-                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/troubleshooting-harmony/">
+                      </a>{" "}
+                      -{" "}
+                      <a
+                        style={{ color: "white" }}
+                        href="https://harmonydata.ac.uk/troubleshooting-harmony/"
+                      >
                         Troubleshooting
                       </a>
                     </p>
@@ -338,7 +363,11 @@ function App() {
                 </Route>
               </Switch>
 
-              <Box sx={{ display: { lg: "block", md: "none", sm: "none", xs: "none" } }}>
+              <Box
+                sx={{
+                  display: { lg: "block", md: "none", sm: "none", xs: "none" },
+                }}
+              >
                 <img
                   src={logoWithText}
                   style={{ visibility: "hidden" }}
@@ -350,7 +379,7 @@ function App() {
             <Slide in={true} direction="up">
               <Box
                 sx={{
-                  width: { lg: "50%", md: "100%" },
+                  width: { lg: "65%", md: "100%" },
                   maxHeight: { lg: "100%" },
                   paddingTop: { lg: "4rem" },
                   overflow: "auto",
@@ -403,8 +432,8 @@ function App() {
               ReactGA.initialize("G-S79J6E39ZP");
             }}
           >
-            This website uses analytics cookies to allow us to improve the user experience.{" "}
-
+            This website uses analytics cookies to allow us to improve the user
+            experience.{" "}
           </CookieConsent>
         </Container>
       </ThemeProvider>
