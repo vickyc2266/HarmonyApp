@@ -325,6 +325,14 @@ function App() {
                       <a style={{ color: "white" }} href="https://harmonydata.ac.uk/privacy-policy">
                         Privacy policy
                       </a>
+                      {" "}-{" "}
+                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/formatting-help/">
+                        Help with formatting
+                      </a>
+                      {" "}-{" "}
+                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/troubleshooting-harmony/">
+                        Troubleshooting
+                      </a>
                     </p>
                   </div>
                 </Route>
