@@ -40,6 +40,18 @@ You can access Harmony in your browser at `http://localhost:3000/app#/`.
 
 ![screenshot](https://harmonydata.ac.uk/images/localhost-min.png)
 
+## How to run this front end and connect to localhost API
+
+Run the [Harmony API](https://github.com/harmonydata/harmonyapi) app in Python.
+
+Open `.env` and change `REACT_APP_API_URL` to `http://localhost:8000`:
+
+```
+REACT_APP_API_URL=http://localhost
+```
+
+Then run `npm install; npm start` as usual.
+
 ## Who to contact?
 
 You can contact Harmony team at https://harmonydata.ac.uk/, Thomas Wood at http://fastdatascience.com/ or John Rogers at http://delosis.com
