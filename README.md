@@ -11,8 +11,8 @@
 
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
-
- [![License](https://img.shields.io/github/license/harmonydata/harmony)](https://github.com/harmonydata/harmony/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/harmonydata/harmony)](https://github.com/harmonydata/harmony/blob/main/LICENSE)
+[![forks](https://img.shields.io/github/forks/harmonydata/app)](https://github.com/harmonydata/app/forks)
 
 <!-- badges: end -->
 
