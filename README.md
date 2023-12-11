@@ -47,7 +47,7 @@ Run the [Harmony API](https://github.com/harmonydata/harmonyapi) app in Python.
 Open `.env` and change `REACT_APP_API_URL` to `http://localhost:8000`:
 
 ```
-REACT_APP_API_URL=http://localhost
+REACT_APP_API_URL=http://localhost:8000
 ```
 
 Then run `npm install; npm start` as usual.
