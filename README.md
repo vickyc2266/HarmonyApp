@@ -11,8 +11,8 @@
 
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
-
- [![License](https://img.shields.io/github/license/harmonydata/harmony)](https://github.com/harmonydata/harmony/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/harmonydata/harmony)](https://github.com/harmonydata/harmony/blob/main/LICENSE)
+[![forks](https://img.shields.io/github/forks/harmonydata/app)](https://github.com/harmonydata/app/forks)
 
 <!-- badges: end -->
 
@@ -39,6 +39,18 @@ npm start
 You can access Harmony in your browser at `http://localhost:3000/app#/`.
 
 ![screenshot](https://harmonydata.ac.uk/images/localhost-min.png)
+
+## How to run this front end and connect to localhost API
+
+Run the [Harmony API](https://github.com/harmonydata/harmonyapi) app in Python.
+
+Open `.env` and change `REACT_APP_API_URL` to `http://localhost:8000`:
+
+```
+REACT_APP_API_URL=http://localhost:8000
+```
+
+Then run `npm install; npm start` as usual.
 
 ## Who to contact?
 
