@@ -34,13 +34,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const [fileInfos, setFileInfos] = useState([
-    {
-      instrument_id: String(new Date().getTime()),
-      instrument_name: "",
-      questions: [{ question_no: "", question_text: "" }],
-    },
-  ]);
+  const [fileInfos, setFileInfos] = useState([]);
   const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({

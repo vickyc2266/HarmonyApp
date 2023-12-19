@@ -1,11 +1,15 @@
 import * as React from "react";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import ListItemText from "@mui/material/ListItemText";
-import Select from "@mui/material/Select";
-import Checkbox from "@mui/material/Checkbox";
+
+import {
+  Box,
+  Checkbox,
+  Select,
+  ListItemText,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  OutlinedInput,
+} from "@mui/material";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -21,6 +25,7 @@ export default function ExistingInstruments({
   existingReceiver,
   existingInstruments,
   fileInfos,
+  sx = {},
 }) {
   const allInstrumentNames = existingInstruments.map((i) => i.instrument_name);
   const instrumentNames = fileInfos.map((i) => i.instrument_name);
@@ -33,8 +38,8 @@ export default function ExistingInstruments({
   };
 
   return (
-    <div>
-      <FormControl sx={{ mt: 2, width: "100%" }}>
+    <Box sx={sx}>
+      <FormControl sx={{ margin: "auto", width: "100%" }}>
         <InputLabel id="ExistingInstruments">
           Choose from existing instruments:
         </InputLabel>
@@ -58,6 +63,6 @@ export default function ExistingInstruments({
           ))}
         </Select>
       </FormControl>
-    </div>
+    </Box>
   );
 }

@@ -14,12 +14,14 @@ import {
   CircularProgress,
   TextField,
   Stack,
+  Tooltip,
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import {
   AddCircleOutline as AddCircleOutlineIcon,
   Delete as DeleteIcon,
   ExpandMore as ExpandMoreIcon,
+  Rowing,
 } from "@mui/icons-material";
 import { useHistory } from "react-router-dom";
 import InlineFeedback from "./InlineFeedback";
@@ -27,6 +29,7 @@ import ExistingInstruments from "./ExistingInstruments";
 import { simplifyApi } from "../utilities/simplifyApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import pdfTableExtractor from "../utilities/pdf-table-extractor";
 
 export default function Upload({
   fileInfos,
@@ -45,6 +48,7 @@ export default function Upload({
     page: "/",
     title: "Upload / Definition",
   });
+
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
     let frp = [];
@@ -53,45 +57,76 @@ export default function Upload({
         new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => {
-            resolve({
-              file_name: file.name,
-              file_type: file.name.split(".").pop().toLowerCase(),
-              content: reader.result,
-            });
+            if (file.name.split(".").pop().toLowerCase() === "pdf") {
+              const uint8array = Uint8Array.from(
+                atob(reader.result.split(",")[1]),
+                (c) => c.charCodeAt(0)
+              );
+              var typedarray = new Uint8Array(uint8array);
+
+              pdfTableExtractor(typedarray)
+                .then((tables) => {
+                  resolve({
+                    file_name: file.name,
+                    file_type: file.name.split(".").pop().toLowerCase(),
+                    content: reader.result,
+                    tables: tables.pageTables,
+                  });
+                })
+                .catch((e) => {
+                  // PDF clientside parsing failed for some reason - defer to the server
+                  console.log(e);
+                  resolve({
+                    file_name: file.name,
+                    file_type: file.name.split(".").pop().toLowerCase(),
+                    content: reader.result,
+                  });
+                });
+            } else {
+              resolve({
+                file_name: file.name,
+                file_type: file.name.split(".").pop().toLowerCase(),
+                content: reader.result,
+              });
+            }
           };
-          reader.onerror = () => {
-            reject({});
+          reader.onerror = (e) => {
+            reject(e);
           };
           reader.readAsDataURL(file);
         })
       );
     });
-    Promise.all(frp).then((allFiles) => {
-      toast.promise(
-        new Promise((resolve, reject) => {
-          postData(process.env.REACT_APP_API_PARSE, allFiles, 15000)
-            .then((data) => {
-              const newFileInfos = [...fileInfos];
-              // Load each returned file / instrument in the data
-              data.forEach((instrument) => {
-                newFileInfos.push(instrument);
+    Promise.all(frp)
+      .then((allFiles) => {
+        toast.promise(
+          new Promise((resolve, reject) => {
+            postData(process.env.REACT_APP_API_PARSE, allFiles, 15000)
+              .then((data) => {
+                const newFileInfos = [...fileInfos];
+                // Load each returned file / instrument in the data
+                data.forEach((instrument) => {
+                  newFileInfos.push(instrument);
+                });
+                setFileInfos(newFileInfos);
+                resolve(true);
+              })
+              .catch((e) => {
+                console.log(e);
+                setParseError(true);
+                reject("Parse Error");
               });
-              setFileInfos(newFileInfos);
-              resolve(true);
-            })
-            .catch((e) => {
-              console.log(e);
-              setParseError(true);
-              reject("Parse Error");
-            });
-        }),
-        {
-          pending: "Parsing files - this may take a while",
-          success: "Success!",
-          error: "Something went wrong - please try again",
-        }
-      );
-    });
+          }),
+          {
+            pending: "Parsing files - this may take a while",
+            success: "Success!",
+            error: "Something went wrong - please try again",
+          }
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
   function existingReceiver(selected) {
@@ -277,8 +312,13 @@ export default function Upload({
   };
 
   const FileInfo = ({ instrument_name, instrument_id, questions }) => {
+    const [expanded, setExpanded] = useState(questions.length < 2);
     return (
-      <Accordion key={instrument_id}>
+      <Accordion
+        key={instrument_id}
+        expanded={expanded}
+        onChange={(e, ex) => setExpanded(ex)}
+      >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           sx={{
@@ -370,13 +410,35 @@ export default function Upload({
       />
 
       <DragDrop filesReceiver={filesReceiver} sx={{ margin: "2rem" }} />
-      <ExistingInstruments
-        existingReceiver={existingReceiver}
-        existingInstruments={existingInstruments}
-        fileInfos={fileInfos}
-      />
-      <Box sx={{ marginTop: "2rem" }}>
-        {fileInfos.length ? fileInfos.map(FileInfo) : ""}
+      <Stack
+        direction={"row"}
+        spacing={1}
+        sx={{ mt: 2, mr: 1, display: "flex", alignItems: "center" }}
+      >
+        <ExistingInstruments
+          sx={{ width: "100%" }}
+          existingReceiver={existingReceiver}
+          existingInstruments={existingInstruments}
+          fileInfos={fileInfos}
+        />
+        <Tooltip title="Type in an instrument">
+          <IconButton
+            aria-label="add-new"
+            onClick={(e) => {
+              e.stopPropagation();
+              insertInstrument();
+            }}
+          >
+            <AddCircleOutlineIcon />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+      <Box sx={{ marginTop: "1rem" }}>
+        {fileInfos.length
+          ? fileInfos.map((fi) => {
+              return <FileInfo {...fi}></FileInfo>;
+            })
+          : ""}
       </Box>
 
       <Button
