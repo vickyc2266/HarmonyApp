@@ -435,8 +435,8 @@ export default function Upload({
       </Stack>
       <Box sx={{ marginTop: "1rem" }}>
         {fileInfos.length
-          ? fileInfos.map((fi) => {
-              return <FileInfo {...fi}></FileInfo>;
+          ? fileInfos.map((fi, i) => {
+              return <FileInfo key={"fileInfo" + i} {...fi}></FileInfo>;
             })
           : ""}
       </Box>

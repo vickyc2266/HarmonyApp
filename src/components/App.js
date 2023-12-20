@@ -32,6 +32,7 @@ import ReactGA from "react-ga4";
 import CookieConsent from "react-cookie-consent";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import MakeMeJSON from "./MakeMeJSON.js";
 
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
@@ -397,6 +398,15 @@ function App() {
                       resultsOptions={resultsOptions}
                       toaster={toast}
                       reportComputedMatches={setComputedMatches}
+                      ReactGA={ReactGA}
+                    />
+                  </Route>
+                  <Route path="/makeMeJSON">
+                    <MakeMeJSON
+                      fileInfos={fileInfos}
+                      setFileInfos={setFileInfos}
+                      setApiData={setApiData}
+                      existingInstruments={existingInstruments}
                       ReactGA={ReactGA}
                     />
                   </Route>
