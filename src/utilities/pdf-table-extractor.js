@@ -324,7 +324,7 @@ const pdf_table_extractor_run = (pdfData) => {
 
                 top = Math.min(lines[i].top, top);
                 bottom = Math.max(lines[i].bottom, bottom);
-                const new_lines = [];
+                var new_lines = [];
                 if (i > 1) {
                   new_lines = lines.slice(0, i - 1);
                 }
