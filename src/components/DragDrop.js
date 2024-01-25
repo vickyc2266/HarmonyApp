@@ -6,7 +6,7 @@ import { Box, Typography, Link } from "@mui/material";
 import PopperHelp from "./PopperHelp";
 function DragDrop({
   filesReceiver,
-  fileTypes = ["pdf", "csv", "xlsx", "docx"],
+  fileTypes = ["pdf", "csv", "xlsx", "docx", "txt"],
 }) {
   return (
     <FileUploader
@@ -74,8 +74,8 @@ function DragDrop({
           <UploadFileIcon sx={{ width: "2rem", height: "2rem" }} />
           <div>
             <p>
-              <u>Upload</u> or drag and drop any <b>pdf, csv, docx or xlsx</b>{" "}
-              file here
+              <u>Upload</u> or drag and drop any{" "}
+              <b>pdf, csv, txt, docx or xlsx</b> file here
             </p>
           </div>
         </>
