@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Container,
   Box,
@@ -35,7 +35,7 @@ import "react-toastify/dist/ReactToastify.css";
 import MakeMeJSON from "./MakeMeJSON.js";
 
 function App() {
-  const [fileInfos, setFileInfos] = useState([]);
+  // const fileInfos = useRef();
   const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({
@@ -48,14 +48,29 @@ function App() {
   const { storeHarmonisation, reportRating } = useData();
   const [ratingValue, setRatingValue] = useState();
   const [computedMatches, setComputedMatches] = useState();
-
+  const [fileInfos, setFileInfos] = useState([]);
+  /* const getFileInfos = () => {
+    console.log(
+      "getting FileInfos from App " + JSON.stringify(fileInfos)
+    );
+    return fileInfos || [];
+  };
+  const setFileInfos = (fi) => {
+    console.log("setting FileInfos in App " + JSON.stringify(fi));
+    fileInfos = fi;
+  };
+ */
   useEffect(() => {
     setMode(prefersDarkMode ? "dark" : "light");
   }, [prefersDarkMode]);
 
   useEffect(() => {
     //default to intraInstrument ON in the case of just one instument in the model
-    if (fileInfos.length == 1 && resultsOptions.intraInstrument == false) {
+    if (
+      fileInfos &&
+      fileInfos.length == 1 &&
+      resultsOptions.intraInstrument == false
+    ) {
       var newResultsOptions = { ...resultsOptions };
       newResultsOptions.intraInstrument = true;
       newResultsOptions.intraInstrumentPreviousState =
@@ -65,6 +80,7 @@ function App() {
 
     // If there is now more than 1 switch it back to what it was before we forced it.
     if (
+      fileInfos &&
       fileInfos.length > 1 &&
       typeof resultsOptions.intraInstrumentPreviousState == "boolean"
     ) {
@@ -74,7 +90,7 @@ function App() {
       delete newResultsOptions.intraInstrumentPreviousState;
       setResultsOptions(newResultsOptions);
     }
-  }, [fileInfos]);
+  }, [fileInfos, resultsOptions]);
 
   useEffect(() => {
     postData(process.env.REACT_APP_API_EXAMPLES)
@@ -403,8 +419,8 @@ function App() {
                   </Route>
                   <Route path="/makeMeJSON">
                     <MakeMeJSON
-                      fileInfos={fileInfos}
-                      setFileInfos={setFileInfos}
+                      appFileInfos={fileInfos}
+                      setAppFileInfos={setFileInfos}
                       setApiData={setApiData}
                       existingInstruments={existingInstruments}
                       ReactGA={ReactGA}
@@ -412,8 +428,8 @@ function App() {
                   </Route>
                   <Route path="*">
                     <Upload
-                      fileInfos={fileInfos}
-                      setFileInfos={setFileInfos}
+                      appFileInfos={fileInfos}
+                      setAppFileInfos={setFileInfos}
                       setApiData={setApiData}
                       existingInstruments={existingInstruments}
                       ReactGA={ReactGA}

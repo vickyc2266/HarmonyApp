@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, memo, useMemo, useCallback } from "react";
 import DragDrop from "./DragDrop";
 import postData from "../utilities/postData";
 import {
@@ -32,8 +32,8 @@ import "react-toastify/dist/ReactToastify.css";
 import pdfTableExtractor from "../utilities/pdf-table-extractor";
 
 export default function Upload({
-  fileInfos,
-  setFileInfos,
+  appFileInfos,
+  setAppFileInfos,
   setApiData,
   existingInstruments,
   ReactGA,
@@ -42,6 +42,9 @@ export default function Upload({
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
   const [grouping, setGrouping] = useState("");
+  const [expanded, setExpanded] = useState(false);
+  const dirty = useRef(false);
+  const localFileInfos = useRef();
   const history = useHistory();
   ReactGA.send({
     hitType: "pageview",
@@ -49,15 +52,41 @@ export default function Upload({
     title: "Upload / Definition",
   });
 
+  const fileInfos = useMemo(() => {
+    return dirty.current ? localFileInfos.current || [] : appFileInfos || [];
+  }, [appFileInfos]);
+
+  const setFileInfos = useCallback((fi) => {
+    console.log("setting local FI " + JSON.stringify(fi));
+    dirty.current = dirty.current + 1;
+    localFileInfos.current = fi;
+  }, []);
+
+  const syncFileInfos = useCallback(() => {
+    console.log("syncing fileinfo");
+    setAppFileInfos(localFileInfos.current);
+    dirty.current = false;
+  });
+
+  const getFileInfo = useCallback(
+    (instrument_id) => {
+      return fileInfos.filter((fi) => {
+        return fi.instrument_id == instrument_id;
+      })[0];
+    },
+    [fileInfos]
+  );
+
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
     let frp = [];
     files.forEach((file) => {
       frp.push(
         new Promise((resolve, reject) => {
+          const fileExt = file.name.split(".").pop().toLowerCase();
           const reader = new FileReader();
           reader.onload = () => {
-            if (file.name.split(".").pop().toLowerCase() === "pdf") {
+            if (fileExt === "pdf") {
               const uint8array = Uint8Array.from(
                 atob(reader.result.split(",")[1]),
                 (c) => c.charCodeAt(0)
@@ -93,7 +122,11 @@ export default function Upload({
           reader.onerror = (e) => {
             reject(e);
           };
-          reader.readAsDataURL(file);
+          if (fileExt === "txt" || fileExt === "csv") {
+            reader.readAsText(file);
+          } else {
+            reader.readAsDataURL(file);
+          }
         })
       );
     });
@@ -115,6 +148,9 @@ export default function Upload({
                 console.log(e);
                 setParseError(true);
                 reject("Parse Error");
+              })
+              .finally((_) => {
+                syncFileInfos();
               });
           }),
           {
@@ -169,13 +205,24 @@ export default function Upload({
     });
 
     setFileInfos(newFileInfos);
+    syncFileInfos();
   }
-
+  const updateInstrument = (instrument_id, value) => {
+    console.log("updating instrument " + instrument_id);
+    const newFileInfos = fileInfos.map((fileInfo) => {
+      if (fileInfo.instrument_id === instrument_id) {
+        fileInfo.instrument_name = value;
+      }
+      return fileInfo;
+    });
+    setFileInfos(newFileInfos);
+  };
   const removeInstrument = (instrument_id) => {
     const newFileInfos = fileInfos.filter((fileInfo) => {
       return fileInfo.instrument_id !== instrument_id;
     });
     setFileInfos(newFileInfos);
+    syncFileInfos();
   };
 
   const insertInstrument = (after_instrument_id) => {
@@ -194,6 +241,7 @@ export default function Upload({
       .concat(fileInfos.slice(after + 1));
     console.log(newFileInfos);
     setFileInfos(newFileInfos);
+    syncFileInfos();
   };
 
   const insertQuestion = (instrument_id, after_question_index) => {
@@ -212,19 +260,9 @@ export default function Upload({
       }
       return fileInfo;
     });
-
     setFileInfos(newFileInfos);
   };
 
-  const updateInstrument = (instrument_id, value) => {
-    const newFileInfos = fileInfos.map((fileInfo) => {
-      if (fileInfo.instrument_id == instrument_id) {
-        fileInfo.instrument_name = value;
-      }
-      return fileInfo;
-    });
-    setFileInfos(newFileInfos);
-  };
   const removeQuestion = (instrument_id, question_index) => {
     const newFileInfos = fileInfos.map((fileInfo) => {
       if (fileInfo.instrument_id == instrument_id) {
@@ -241,6 +279,7 @@ export default function Upload({
     new_question_no,
     new_question_text
   ) => {
+    console.log("updating Q");
     const newFileInfos = fileInfos.map((fileInfo) => {
       if (fileInfo.instrument_id == instrument_id) {
         if (new_question_no)
@@ -253,75 +292,110 @@ export default function Upload({
     setFileInfos(newFileInfos);
   };
 
-  const QuestionDetail = (
-    { question_no, question_text },
-    index,
-    instrument_id
-  ) => {
-    return (
-      <ListItem
-        key={instrument_id + "_" + index}
-        sx={{ alignItems: "flex-end", pr: 0, mr: 0 }}
-      >
-        <TextField
-          //setting the key to ensure the whole box is rerendered when the value changes
-          key={instrument_id + "_" + index + "_" + question_no}
-          sx={{ width: 35, px: 0, mx: 0 }}
-          variant={"standard"}
-          defaultValue={question_no}
-          placeholder={question_no ? "" : "#"}
-          onBlur={(e) => {
-            updateQuestion(instrument_id, index, e.target.value);
-          }}
-        />
-        <TextField
-          multiline
-          //setting the key to ensure the whole box is rerendered when the value changes
-          key={instrument_id + "_" + index + question_text}
-          sx={{ width: "100%", px: 1 }}
-          variant={"standard"}
-          defaultValue={question_text}
-          placeholder={question_text ? "" : "Enter your question text"}
-          onBlur={(e) => {
-            updateQuestion(instrument_id, index, null, e.target.value);
-          }}
-        />
-        <Stack direction="row" spacing={0} sx={{ mx: 0, right: 0 }}>
-          <IconButton
-            aria-label="delete"
-            title="Delete this question"
-            onClick={() => {
-              removeQuestion(instrument_id, index);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-          <IconButton
-            sx={{ pr: 0.7 }}
-            aria-label="add-new"
-            title="Add new question here"
-            onClick={(e) => {
-              insertQuestion(instrument_id, index);
-            }}
-          >
-            <AddCircleOutlineIcon />
-          </IconButton>
-        </Stack>
-      </ListItem>
-    );
+  const getQuestion = (instrument_id, index) => {
+    return fileInfos.filter((fi) => {
+      return fi.instrument_id == instrument_id;
+    })[0].questions[index];
   };
 
-  const FileInfo = ({ instrument_name, instrument_id, questions }) => {
-    const [expanded, setExpanded] = useState(questions.length < 2);
+  const QuestionDetail = memo(
+    ({ question, index, instrument_id, rerender }) => {
+      return (
+        <ListItem
+          key={instrument_id + "_" + index + "_" + question.question_no}
+          sx={{ alignItems: "flex-end", pr: 0, mr: 0 }}
+        >
+          <TextField
+            //setting the key to ensure the whole box is rerendered when the value changes
+            key={instrument_id + "_" + index + "_" + question.question_no}
+            sx={{ width: 35, px: 0, mx: 0 }}
+            variant={"standard"}
+            defaultValue={getQuestion(instrument_id, index).question_no}
+            placeholder={question.question_no ? "" : "#"}
+            onBlur={(e) => {
+              updateQuestion(instrument_id, index, e.target.value);
+              rerender((prev) => (prev || 0) + 1);
+            }}
+            onClickCapture={(e) => {
+              e.stopPropagation();
+            }}
+          />
+          <TextField
+            multiline
+            //setting the key to ensure the whole box is rerendered when the value changes
+            key={instrument_id + "_" + index + question.question_text}
+            sx={{ width: "100%", px: 1 }}
+            variant={"standard"}
+            defaultValue={getQuestion(instrument_id, index).question_text}
+            placeholder={"Enter your question text"}
+            onBlur={(e) => {
+              updateQuestion(instrument_id, index, null, e.target.value);
+              rerender((prev) => (prev || 0) + 1);
+            }}
+            onClickCapture={(e) => {
+              e.stopPropagation();
+            }}
+          />
+          <Stack
+            direction="row"
+            spacing={0}
+            sx={{ pointerEvents: "none", mx: 0, right: 0 }}
+          >
+            <IconButton
+              sx={{ pointerEvents: "auto" }}
+              aria-label="delete"
+              title="Delete this question"
+              onClickCapture={(e) => {
+                e.stopPropagation();
+                removeQuestion(instrument_id, index);
+                rerender((prev) => (prev || 0) + 1);
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+            <IconButton
+              sx={{ pointerEvents: "auto", pr: 0.7 }}
+              aria-label="add-new"
+              title="Add new question here"
+              onClickCapture={(e) => {
+                e.stopPropagation();
+                insertQuestion(instrument_id, index);
+                rerender((prev) => (prev || 0) + 1);
+              }}
+            >
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </Stack>
+        </ListItem>
+      );
+    }
+  );
+
+  const FileInfo = ({ fi }) => {
+    const instrument_id = fi.instrument_id;
+    const fileInfo = fi;
+    const [_, rerender] = useState();
+    console.log("rendering " + instrument_id + fileInfo.instrument_name);
     return (
       <Accordion
+        id={instrument_id}
         key={instrument_id}
-        expanded={expanded}
-        onChange={(e, ex) => setExpanded(ex)}
+        expanded={expanded == instrument_id}
+        onChange={(e, ex) => {
+          setExpanded(ex ? instrument_id : false);
+          syncFileInfos();
+        }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
+          expandIcon={
+            <ExpandMoreIcon
+              sx={{
+                pointerEvents: "auto",
+              }}
+            />
+          }
           sx={{
+            pointerEvents: "none",
             flexDirection: "row",
             alignItems: "center",
             "& .MuiAccordionSummary-content": {
@@ -333,54 +407,75 @@ export default function Upload({
         >
           <TextField
             variant="standard"
-            sx={{ width: "100%", pr: 1, focusVisibleClassName: "NA" }}
-            defaultValue={instrument_name}
-            placeholder={
-              instrument_name
-                ? ""
-                : "Manually create your instrument - add a name"
-            }
+            sx={{
+              pointerEvents: "auto",
+              width: "100%",
+              pr: 1,
+              focusVisibleClassName: "NA",
+            }}
+            defaultValue={fileInfo.instrument_name}
+            placeholder={"Manually create your instrument - add a name"}
+            onClickCapture={(e) => {
+              e.stopPropagation();
+            }}
             onBlur={(e) => {
               updateInstrument(instrument_id, e.target.value);
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
+              rerender((i) => i || 0 + 1);
             }}
           />
           <IconButton
             aria-label="delete"
-            onClick={() => {
+            onClickCapture={(e) => {
+              e.stopPropagation();
               removeInstrument(instrument_id);
+            }}
+            sx={{
+              pointerEvents: "auto",
             }}
           >
             <DeleteIcon />
           </IconButton>
           <IconButton
             aria-label="add-new"
-            onClick={(e) => {
+            onClickCapture={(e) => {
               e.stopPropagation();
               insertInstrument(instrument_id);
+            }}
+            sx={{
+              pointerEvents: "auto",
             }}
           >
             <AddCircleOutlineIcon />
           </IconButton>
         </AccordionSummary>
-        <AccordionDetails
-          sx={{
-            width: "100%",
-            marginTop: -3,
-            marginLeft: -2,
-            maxHeight: "300px",
-            maxHeight: "30vh",
-            overflowY: "auto",
-          }}
-        >
-          <List dense={true}>
-            {questions.map((question, i) => {
-              return QuestionDetail(question, i, instrument_id);
-            })}
-          </List>
-        </AccordionDetails>
+        {expanded && expanded === instrument_id && (
+          <AccordionDetails
+            sx={{
+              width: "100%",
+              marginTop: -3,
+              marginLeft: -2,
+              maxHeight: "",
+              maxHeight: "50vh",
+              overflowY: "auto",
+            }}
+          >
+            {fileInfo.questions && fileInfo.questions.length && (
+              <List dense={true}>
+                {fileInfo.questions.map((question, i) => {
+                  return (
+                    <QuestionDetail
+                      key={instrument_id + "_" + i}
+                      question={question}
+                      index={i}
+                      instrument_id={instrument_id}
+                      rerender={rerender}
+                    />
+                  );
+                })}
+              </List>
+            )}
+          </AccordionDetails>
+        )}
       </Accordion>
     );
   };
@@ -413,10 +508,16 @@ export default function Upload({
       <Stack
         direction={"row"}
         spacing={1}
-        sx={{ mt: 2, mr: 1, display: "flex", alignItems: "center" }}
+        sx={{
+          mt: 2,
+          mr: 1,
+          display: "flex",
+          alignItems: "center",
+          maxWidth: "100%",
+        }}
       >
         <ExistingInstruments
-          sx={{ width: "100%" }}
+          sx={{ width: "100%", flexShrink: 2 }}
           existingReceiver={existingReceiver}
           existingInstruments={existingInstruments}
           fileInfos={fileInfos}
@@ -434,17 +535,18 @@ export default function Upload({
         </Tooltip>
       </Stack>
       <Box sx={{ marginTop: "1rem" }}>
-        {fileInfos.length
+        {fileInfos && fileInfos.length
           ? fileInfos.map((fi, i) => {
-              return <FileInfo key={"fileInfo" + i} {...fi}></FileInfo>;
+              return <FileInfo key={fi.instrument_id} fi={fi}></FileInfo>;
             })
           : ""}
       </Box>
 
       <Button
         variant="contained"
+        size="large"
         sx={{ margin: "2rem" }}
-        disabled={fileInfos.length === 0 || loading}
+        disabled={!fileInfos || fileInfos.length === 0 || loading}
         onClick={() => {
           setLoading(true);
           postData(

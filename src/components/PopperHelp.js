@@ -19,7 +19,10 @@ function PopperHelp({
     setAnchorEl(null);
   }
 
-  function handleClick() {
+  function handleClick(e) {
+    e.stopPropagation();
+    e.nativeEvent.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
     setAnchorEl(anchorEl ? null : anchorRef.current || null);
   }
   return (
@@ -27,7 +30,7 @@ function PopperHelp({
       sx={sx}
       className="pulse"
       ref={anchorRef}
-      onClick={handleClick}
+      onClickCapture={handleClick}
       onMouseOver={handleHover}
       onMouseLeave={handleUnHover}
     >
