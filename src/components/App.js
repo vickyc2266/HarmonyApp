@@ -333,13 +333,10 @@ function App() {
                       Harmonise questionnaire items - with Harmony
                     </h1>
                     <p>
-                      Harmony is a tool for retrospective harmonisation of
-                      questionnaire items.
+                      Do you need to combine surveys or questionnaires with different wording for similar questions, such as <i>anxiety</i> vs <i>I feel anxious</i>?
                     </p>
-                    <p>
-                      If you want to compare items from different surveys, such
-                      as GAD-7 and PHQ-9, Harmony can identify which questions
-                      match.
+                    <p> 
+                      This is a common problem in psychology, politics, market research, and the social sciences, especially when surveys have been run by different organisations or in different countries.
                     </p>
                     <p>
                       <a
