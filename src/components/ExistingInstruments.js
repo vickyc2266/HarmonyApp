@@ -41,7 +41,7 @@ export default function ExistingInstruments({
     <Box sx={sx}>
       <FormControl sx={{ margin: "auto", width: "100%" }}>
         <InputLabel id="ExistingInstruments">
-          Choose from existing instruments:
+          or choose from existing instruments:
         </InputLabel>
         <Select
           labelId="ExistingInstruments"
@@ -51,7 +51,7 @@ export default function ExistingInstruments({
             return allInstrumentNames.includes(i);
           })}
           onChange={handleChange}
-          input={<OutlinedInput label="Choose from existing instruments" />}
+          input={<OutlinedInput label="or choose from existing instruments" />}
           renderValue={(selected) => selected.join(", ")}
           MenuProps={MenuProps}
         >
