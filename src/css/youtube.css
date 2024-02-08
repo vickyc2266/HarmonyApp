@@ -1,0 +1,28 @@
+.youtubeIframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+}
+
+.youtubeContainer {
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.youtubeContainerFull {
+  transition: all 0.2s ease-in-out;
+  display: contents;
+  width: 100%;
+  aspect-ratio: 16/9;
+  margin-left: auto;
+  margin-right: auto;
+}

@@ -33,8 +33,11 @@ import CookieConsent, { getCookieConsentValue } from "react-cookie-consent";
 import { ToastContainer, toast } from "react-toastify";
 import MakeMeJSON from "./MakeMeJSON.js";
 import "react-toastify/dist/ReactToastify.css";
+import YouTube from "react-youtube";
+import "../css/youtube.css";
 
 function App() {
+  const [fullscreen, setFullscreen] = useState(false);
   const [existingInstruments, setExistingInstruments] = useState([]);
   const [apiData, setApiData] = useState({});
   const [resultsOptions, setResultsOptions] = useState({
@@ -325,10 +328,15 @@ function App() {
                       Harmonise questionnaire items - with Harmony
                     </h1>
                     <p>
-                      Do you need to combine surveys or questionnaires with different wording for similar questions, such as <i>anxiety</i> vs <i>I feel anxious</i>?
+                      Do you need to combine surveys or questionnaires with
+                      different wording for similar questions, such as{" "}
+                      <i>anxiety</i> vs <i>I feel anxious</i>?
                     </p>
-                    <p> 
-                      This is a common problem in psychology, politics, market research, and the social sciences, especially when surveys have been run by different organisations or in different countries.
+                    <p>
+                      This is a common problem in psychology, politics, market
+                      research, and the social sciences, especially when surveys
+                      have been run by different organisations or in different
+                      countries.
                     </p>
                     <p>
                       <a
@@ -360,20 +368,15 @@ function App() {
                       </a>
                     </p>
                   </div>
+                  <YouTube
+                    className={"youtubeContainer" + (fullscreen ? "Full" : "")}
+                    iframeClassName="youtubeIframe"
+                    videoId="cEZppTBj1NI"
+                    onPlay={() => setFullscreen(true)}
+                    onPause={() => setFullscreen(false)}
+                  />
                 </Route>
               </Switch>
-
-              <Box
-                sx={{
-                  display: { lg: "block", md: "none", sm: "none", xs: "none" },
-                }}
-              >
-                <img
-                  src={logoWithText}
-                  style={{ visibility: "hidden" }}
-                  alt="Harmony Logo"
-                />
-              </Box>
             </Box>
             <HarmonyAppBar></HarmonyAppBar>
             <Slide in={true} direction="up">
