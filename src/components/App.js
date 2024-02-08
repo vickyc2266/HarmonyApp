@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useMemo, useRef } from "react";
+=======
+import React, { useState, useEffect, useMemo } from "react";
+>>>>>>> dev
 import {
   Container,
   Box,
@@ -29,10 +33,19 @@ import postData from "../utilities/postData";
 import { useData } from "../contexts/DataContext";
 import { utils as XLSXutils, writeFile as XLSXwriteFile } from "xlsx";
 import ReactGA from "react-ga4";
+<<<<<<< HEAD
 import CookieConsent from "react-cookie-consent";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import MakeMeJSON from "./MakeMeJSON.js";
+=======
+import CookieConsent, {
+  Cookies,
+  getCookieConsentValue,
+} from "react-cookie-consent";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+>>>>>>> dev
 
 function App() {
   // const fileInfos = useRef();
@@ -48,6 +61,7 @@ function App() {
   const { storeHarmonisation, reportRating } = useData();
   const [ratingValue, setRatingValue] = useState();
   const [computedMatches, setComputedMatches] = useState();
+<<<<<<< HEAD
   const [fileInfos, setFileInfos] = useState([]);
   /* const getFileInfos = () => {
     console.log(
@@ -60,6 +74,9 @@ function App() {
     fileInfos = fi;
   };
  */
+=======
+
+>>>>>>> dev
   useEffect(() => {
     setMode(prefersDarkMode ? "dark" : "light");
   }, [prefersDarkMode]);
@@ -93,6 +110,10 @@ function App() {
   }, [fileInfos, resultsOptions]);
 
   useEffect(() => {
+    if (getCookieConsentValue("harmonyCookieConsent")) {
+      ReactGA.initialize("G-S79J6E39ZP");
+      console.log("GA enabled");
+    }
     postData(process.env.REACT_APP_API_EXAMPLES)
       .then((data) => {
         setExistingInstruments(data);
@@ -450,6 +471,7 @@ function App() {
             expires={150}
             onAccept={() => {
               ReactGA.initialize("G-S79J6E39ZP");
+              console.log("GA enabled");
             }}
           >
             This website uses analytics cookies to allow us to improve the user
