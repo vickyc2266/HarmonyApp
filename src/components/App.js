@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, Box, Slide, useMediaQuery, Link, Typography, Rating } from "@mui/material";
+import {
+  Container,
+  Box,
+  Slide,
+  useMediaQuery,
+  Link,
+  Typography,
+  Rating,
+} from "@mui/material";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import Upload from "./Upload";
 import Results from "./Results";
@@ -20,10 +28,13 @@ import { ColorModeContext } from "../contexts/ColorModeContext";
 import postData from "../utilities/postData";
 import { useData } from "../contexts/DataContext";
 import { utils as XLSXutils, writeFile as XLSXwriteFile } from "xlsx";
-import ReactGA from 'react-ga4';
-import CookieConsent from "react-cookie-consent";
+import ReactGA from "react-ga4";
+import CookieConsent, {
+  Cookies,
+  getCookieConsentValue,
+} from "react-cookie-consent";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [fileInfos, setFileInfos] = useState([]);
@@ -39,8 +50,6 @@ function App() {
   const { storeHarmonisation, reportRating } = useData();
   const [ratingValue, setRatingValue] = useState();
   const [computedMatches, setComputedMatches] = useState();
-
-
 
   useEffect(() => {
     setMode(prefersDarkMode ? "dark" : "light");
@@ -70,6 +79,10 @@ function App() {
   }, [fileInfos]);
 
   useEffect(() => {
+    if (getCookieConsentValue("harmonyCookieConsent")) {
+      ReactGA.initialize("G-S79J6E39ZP");
+      console.log("GA enabled");
+    }
     postData(process.env.REACT_APP_API_EXAMPLES)
       .then((data) => {
         setExistingInstruments(data);
@@ -119,43 +132,43 @@ function App() {
   };
 
   const ratingToast = () => {
-
-    if (!document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("harmonyHasRated"))) {
+    if (
+      !document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("harmonyHasRated"))
+    ) {
       toast(
         <Box>
           <Typography component="legend">Are you enjoying Harmony?</Typography>
-          <Box><Rating
-            name="simple-controlled"
-            value={ratingValue}
-            onChange={(event, newValue) => {
-              console.log(newValue);
-              setRatingValue(newValue);
-              reportRating(newValue);
-              document.cookie =
-                "harmonyHasRated=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=None; Secure";
-              ReactGA && ReactGA.event({
-                category: "Actions",
-                action: "Rating",
-                value: Number(newValue)
-              })
-            }}
-          />
+          <Box>
+            <Rating
+              name="simple-controlled"
+              value={ratingValue}
+              onChange={(event, newValue) => {
+                console.log(newValue);
+                setRatingValue(newValue);
+                reportRating(newValue);
+                document.cookie =
+                  "harmonyHasRated=true; expires=Fri, 31 Dec 9999 23:59:59 GMT; SameSite=None; Secure";
+                ReactGA &&
+                  ReactGA.event({
+                    category: "Actions",
+                    action: "Rating",
+                    value: Number(newValue),
+                  });
+              }}
+            />
           </Box>
-        </Box>, {
-        autoClose: false
-      });
-
-
-
+        </Box>,
+        {
+          autoClose: false,
+        }
+      );
     }
-
-
-  }
+  };
 
   const saveToMyHarmony = () => {
-    setTimeout(ratingToast, 1000)
+    setTimeout(ratingToast, 1000);
     let h = {};
     h.apiData = JSON.parse(JSON.stringify(apiData));
     h.resultsOptions = resultsOptions;
@@ -173,26 +186,26 @@ function App() {
     });
   };
 
-
   const downloadExcel = () => {
-    setTimeout(ratingToast, 1000)
+    setTimeout(ratingToast, 1000);
 
-    const matchSheet = computedMatches.reduce(function (a, cm, i) {
-      let q = getQuestion(cm.qi)
-      let mq = getQuestion(cm.mqi)
-      a.push({
-        instrument1: q.instrument.name,
-        question1_no: q.question_no,
-        question1_text: q.question_text,
-        question1_topics: q.topics_auto.toString(),
-        instrument2: mq.instrument.name,
-        question2_no: mq.question_no,
-        question2_text: mq.question_text,
-        question2_topics: mq.topics_auto.toString(),
-        match: cm.match,
-      });
-      return a;
-    }, [])
+    const matchSheet = computedMatches
+      .reduce(function (a, cm, i) {
+        let q = getQuestion(cm.qi);
+        let mq = getQuestion(cm.mqi);
+        a.push({
+          instrument1: q.instrument.name,
+          question1_no: q.question_no,
+          question1_text: q.question_text,
+          question1_topics: q.topics_auto.toString(),
+          instrument2: mq.instrument.name,
+          question2_no: mq.question_no,
+          question2_text: mq.question_text,
+          question2_topics: mq.topics_auto.toString(),
+          match: cm.match,
+        });
+        return a;
+      }, [])
       .flat()
       .sort((a, b) => {
         if (Math.abs(a.match) < Math.abs(b.match)) {
@@ -207,7 +220,8 @@ function App() {
       .map((i) => {
         return i.questions;
       })
-      .flat().sort((a, b) => {
+      .flat()
+      .sort((a, b) => {
         if (a.question_index > b.question_index) {
           return 1;
         }
@@ -217,20 +231,18 @@ function App() {
         return 0;
       });
 
-    const headers = allQs.map(q => {
-      return q.instrument.name + ' ' + q.question_no
+    const headers = allQs.map((q) => {
+      return q.instrument.name + " " + q.question_no;
     });
-    const subheaders = allQs.map(q => {
-      return q.question_text
+    const subheaders = allQs.map((q) => {
+      return q.question_text;
     });
 
     const matrixSheet = allQs.map((q, i) => {
       return Array(i + 1).concat(q.matches);
     });
-    matrixSheet.unshift(subheaders)
-    matrixSheet.unshift(headers)
-
-
+    matrixSheet.unshift(subheaders);
+    matrixSheet.unshift(headers);
 
     const matches = XLSXutils.json_to_sheet(matchSheet);
     const matrix = XLSXutils.aoa_to_sheet(matrixSheet);
@@ -288,7 +300,7 @@ function App() {
                 color: "white",
               }}
             >
-              <Link href="#" sx={{ width: "80%", maxWidth: 700, mx: "auto" }} >
+              <Link href="#" sx={{ width: "80%", maxWidth: 700, mx: "auto" }}>
                 <img src={logoWithText} alt="Harmony Logo" />
               </Link>
 
@@ -319,11 +331,17 @@ function App() {
                       match.
                     </p>
                     <p>
-                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/frequently-asked-questions">
+                      <a
+                        style={{ color: "white" }}
+                        href="https://harmonydata.ac.uk/frequently-asked-questions"
+                      >
                         FAQs
                       </a>{" "}
                       -{" "}
-                      <a style={{ color: "white" }} href="https://harmonydata.ac.uk/privacy-policy">
+                      <a
+                        style={{ color: "white" }}
+                        href="https://harmonydata.ac.uk/privacy-policy"
+                      >
                         Privacy policy
                       </a>
                     </p>
@@ -331,7 +349,11 @@ function App() {
                 </Route>
               </Switch>
 
-              <Box sx={{ display: { lg: "block", md: "none", sm: "none", xs: "none" } }}>
+              <Box
+                sx={{
+                  display: { lg: "block", md: "none", sm: "none", xs: "none" },
+                }}
+              >
                 <img
                   src={logoWithText}
                   style={{ visibility: "hidden" }}
@@ -342,7 +364,6 @@ function App() {
             <HarmonyAppBar></HarmonyAppBar>
             <Slide in={true} direction="up">
               <Box
-
                 sx={{
                   width: { lg: "50%", md: "100%" },
                   maxHeight: { lg: "100%" },
@@ -395,10 +416,11 @@ function App() {
             expires={150}
             onAccept={() => {
               ReactGA.initialize("G-S79J6E39ZP");
+              console.log("GA enabled");
             }}
           >
-            This website uses analytics cookies to allow us to improve the user experience.{" "}
-
+            This website uses analytics cookies to allow us to improve the user
+            experience.{" "}
           </CookieConsent>
         </Container>
       </ThemeProvider>
