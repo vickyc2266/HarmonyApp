@@ -325,11 +325,10 @@ function App() {
                 <Route path="*">
                   <div>
                     <h1 style={{ color: "white" }}>
-                      Harmonise questionnaire items - with Harmony
+                      Harmonise questionnaire items
                     </h1>
                     <p>
-                      Do you need to combine surveys or questionnaires with
-                      different wording for similar questions, such as{" "}
+                      Harmony is a tool which can read questionnaires and find questions with similar meanings, such as{" "}
                       <i>anxiety</i> vs <i>I feel anxious</i>?
                     </p>
                     <p>

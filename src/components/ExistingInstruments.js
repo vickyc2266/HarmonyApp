@@ -41,7 +41,7 @@ export default function ExistingInstruments({
     <Box sx={sx}>
       <FormControl sx={{ margin: "auto", width: "100%" }}>
         <InputLabel id="ExistingInstruments">
-          or choose from existing instruments:
+          or you can choose from Harmony's database of questionnaires
         </InputLabel>
         <Select
           labelId="ExistingInstruments"
@@ -51,7 +51,7 @@ export default function ExistingInstruments({
             return allInstrumentNames.includes(i);
           })}
           onChange={handleChange}
-          input={<OutlinedInput label="or choose from existing instruments" />}
+          input={<OutlinedInput label="or you can choose from Harmony's database of questionnaires" />}
           renderValue={(selected) => selected.join(", ")}
           MenuProps={MenuProps}
         >
