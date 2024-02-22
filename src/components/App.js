@@ -329,7 +329,7 @@ function App() {
                     </h1>
                     <p>
                       Harmony is an AI tool which can read questionnaires and find questions with similar meanings, such as{" "}
-                      <i>anxiety</i> vs <i>I feel anxious</i>?
+                      <i>anxiety</i> vs <i>I feel anxious</i>.
                     </p>
                     <p>
                       Psychologists sometimes need to combine survey results, especially when surveys
