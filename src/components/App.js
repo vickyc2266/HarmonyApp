@@ -337,7 +337,7 @@ function App() {
                       countries.
                     </p>
                     <p>
-                      Try Harmony with two example PDFs: <a  style={{ color: "white" }} href="https://adaa.org/sites/default/files/GAD-7_Anxiety-updated_0.pdf">GAD-7 PDF</a> vs <a  style={{ color: "white" }} href="https://www.apa.org/depression-guideline/patient-health-questionnaire.pdf">PHQ-9 PDF</a>.
+                      Try two example PDFs: <a target="gad7-pdf" style={{ color: "white" }} href="https://adaa.org/sites/default/files/GAD-7_Anxiety-updated_0.pdf">GAD-7 PDF</a> vs <a target="phq-pdf" style={{ color: "white" }} href="https://www.apa.org/depression-guideline/patient-health-questionnaire.pdf">PHQ-9 PDF</a>.
                     </p>
                     <p>
                       <a
