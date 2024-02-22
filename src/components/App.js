@@ -325,18 +325,19 @@ function App() {
                 <Route path="*">
                   <div>
                     <h1 style={{ color: "white" }}>
-                      Harmonise questionnaire items - with Harmony
+                      Harmonise questionnaire items
                     </h1>
                     <p>
-                      Do you need to combine surveys or questionnaires with
-                      different wording for similar questions, such as{" "}
-                      <i>anxiety</i> vs <i>I feel anxious</i>?
+                      Harmony is an AI tool which can read questionnaires and find questions with similar meanings, such as{" "}
+                      <i>anxiety</i> vs <i>I feel anxious</i>.
                     </p>
                     <p>
-                      This is a common problem in psychology, politics, market
-                      research, and the social sciences, especially when surveys
+                      Psychologists sometimes need to combine survey results, especially when surveys
                       have been run by different organisations or in different
                       countries.
+                    </p>
+                    <p>
+                      Try two example PDFs: <a target="gad7-pdf" style={{ color: "white" }} href="https://adaa.org/sites/default/files/GAD-7_Anxiety-updated_0.pdf">GAD-7 PDF</a> vs <a target="phq-pdf" style={{ color: "white" }} href="https://www.apa.org/depression-guideline/patient-health-questionnaire.pdf">PHQ-9 PDF</a>.
                     </p>
                     <p>
                       <a

@@ -74,8 +74,8 @@ function DragDrop({
           <UploadFileIcon sx={{ width: "2rem", height: "2rem" }} />
           <div>
             <p>
-              <u>Upload</u> or drag and drop any{" "}
-              <b>pdf, csv, txt, docx or xlsx</b> file here
+              <u>Upload</u> or drag and drop one or more questionnaires here.{" "}
+              Files can be in <b>pdf, csv, txt, docx or xlsx</b> format (<a href="https://harmonydata.ac.uk/formatting-help/">examples</a>)
             </p>
           </div>
         </>
