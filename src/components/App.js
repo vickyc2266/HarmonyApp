@@ -332,12 +332,12 @@ function App() {
                       <i>anxiety</i> vs <i>I feel anxious</i>?
                     </p>
                     <p>
-                      Psychologists, political pollers, market researchers, and other social scientists sometimes need to combine data from different questionnaires, especially when surveys
+                      Psychologists sometimes need to combine survey results, especially when surveys
                       have been run by different organisations or in different
                       countries.
                     </p>
                     <p>
-                      Try Harmony with two example PDFs: <a href="https://adaa.org/sites/default/files/GAD-7_Anxiety-updated_0.pdf">GAD-7 PDF</a> vs <a href="https://www.apa.org/depression-guideline/patient-health-questionnaire.pdf">PHQ-9 PDF</a>.
+                      Try Harmony with two example PDFs: <a  style={{ color: "white" }} href="https://adaa.org/sites/default/files/GAD-7_Anxiety-updated_0.pdf">GAD-7 PDF</a> vs <a  style={{ color: "white" }} href="https://www.apa.org/depression-guideline/patient-health-questionnaire.pdf">PHQ-9 PDF</a>.
                     </p>
                     <p>
                       <a
