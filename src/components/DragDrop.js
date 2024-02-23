@@ -8,15 +8,23 @@ function DragDrop({
   filesReceiver,
   fileTypes = ["pdf", "csv", "xlsx", "docx", "txt"],
 }) {
+  const [forceHelp, setForceHelp] = React.useState(false);
   return (
     <FileUploader
+      classes="drop_zone"
+      multiple={true}
+      handleChange={filesReceiver}
+      name="file"
+      types={fileTypes}
       children={
         <>
           <PopperHelp
-            sx={{ position: "absolute", top: 0, right: 0 }}
+            sx={{ position: "absolute", top: 0, right: 0, color: "#0de5b2" }}
             onClick={(e) => {
+              setForceHelp(0);
               e.stopPropagation();
             }}
+            setOpen={forceHelp}
           >
             <Typography>
               <p>Harmony supports the following file types:</p>
@@ -72,19 +80,26 @@ function DragDrop({
             </Typography>
           </PopperHelp>
           <UploadFileIcon sx={{ width: "2rem", height: "2rem" }} />
-          <div>
-            <p>
-              <u>Upload</u> or drag and drop one or more questionnaires here.{" "}
-              Files can be in <b>pdf, csv, txt, docx or xlsx</b> format (<a href="https://harmonydata.ac.uk/formatting-help/">examples</a>)
-            </p>
-          </div>
+          <Box>
+            <Typography>
+              <Link>Upload</Link> or drag and drop one or more questionnaires
+              here. Files can be in <b>pdf, csv, txt, docx or xlsx</b> format (
+              <Link
+                onClickCapture={(e) => {
+                  e.nativeEvent.stopPropagation();
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setForceHelp(forceHelp + 1);
+                }}
+                href="#"
+              >
+                examples
+              </Link>
+              )
+            </Typography>
+          </Box>
         </>
       }
-      classes="drop_zone"
-      multiple={true}
-      handleChange={filesReceiver}
-      name="file"
-      types={fileTypes}
     />
   );
 }

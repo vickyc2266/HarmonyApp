@@ -1,16 +1,23 @@
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import ArrowedPopper from "./ArrowedPopper";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { IconButton } from "@mui/material";
 
 function PopperHelp({
   sx = {},
-  placement = "bottom-start",
+  placement = "top-end",
   component = <HelpOutlineIcon fontSize="large" />,
   children,
+  setOpen,
 }) {
   const [anchorEl, setAnchorEl] = useState();
   const anchorRef = useRef();
+
+  useEffect(() => {
+    if (setOpen && anchorRef.current) {
+      setAnchorEl(anchorRef.current);
+    }
+  }, [setOpen]);
 
   function handleHover() {
     setAnchorEl(anchorRef.current);

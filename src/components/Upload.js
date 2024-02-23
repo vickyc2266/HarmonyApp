@@ -418,6 +418,10 @@ export default function Upload({
             onClickCapture={(e) => {
               e.stopPropagation();
             }}
+            onFocus={(e) => {
+              console.log("entered  " + instrument_id);
+              setExpanded(instrument_id);
+            }}
             onBlur={(e) => {
               updateInstrument(instrument_id, e.target.value);
               rerender((i) => i || 0 + 1);

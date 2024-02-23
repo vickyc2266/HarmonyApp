@@ -52,7 +52,8 @@ function ArrowedPopper({ anchorEl, open, placement, children }) {
 
   return (
     <Popper
-      style={{ zIndex: 10, maxWidth: "500px", margin: "80px" }}
+      elevation={8}
+      style={{ zIndex: 100, maxWidth: "500px", margin: "80px" }}
       anchorEl={anchorEl}
       open={open}
       placement={placement}
@@ -88,8 +89,8 @@ function ArrowedPopper({ anchorEl, open, placement, children }) {
       ]}
     >
       {({ TransitionProps }) => (
-        <Fade {...TransitionProps} timeout={700}>
-          <Paper elevation={3} sx={{ p: 2 }}>
+        <Fade {...TransitionProps} timeout={300}>
+          <Paper elevation={8} sx={{ p: 2 }}>
             {children}
           </Paper>
           {/* <Box
