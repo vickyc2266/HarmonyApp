@@ -71,7 +71,7 @@ export default function Upload({
   const getFileInfo = useCallback(
     (instrument_id) => {
       return fileInfos.filter((fi) => {
-        return fi.instrument_id == instrument_id;
+        return fi.instrument_id === instrument_id;
       })[0];
     },
     [fileInfos]
@@ -255,7 +255,7 @@ export default function Upload({
       .concat(instrument.questions.slice(after_question_index + 1));
 
     const newFileInfos = fileInfos.map((fileInfo) => {
-      if (fileInfo.instrument_id == instrument_id) {
+      if (fileInfo.instrument_id === instrument_id) {
         fileInfo.questions = questions;
       }
       return fileInfo;
@@ -265,7 +265,7 @@ export default function Upload({
 
   const removeQuestion = (instrument_id, question_index) => {
     const newFileInfos = fileInfos.map((fileInfo) => {
-      if (fileInfo.instrument_id == instrument_id) {
+      if (fileInfo.instrument_id === instrument_id) {
         fileInfo.questions.splice(question_index, 1);
       }
       return fileInfo;
@@ -281,7 +281,7 @@ export default function Upload({
   ) => {
     console.log("updating Q");
     const newFileInfos = fileInfos.map((fileInfo) => {
-      if (fileInfo.instrument_id == instrument_id) {
+      if (fileInfo.instrument_id === instrument_id) {
         if (new_question_no)
           fileInfo.questions[question_index].question_no = new_question_no;
         if (new_question_text)
@@ -294,7 +294,7 @@ export default function Upload({
 
   const getQuestion = (instrument_id, index) => {
     return fileInfos.filter((fi) => {
-      return fi.instrument_id == instrument_id;
+      return fi.instrument_id === instrument_id;
     })[0].questions[index];
   };
 
@@ -380,7 +380,7 @@ export default function Upload({
       <Accordion
         id={instrument_id}
         key={instrument_id}
-        expanded={expanded == instrument_id}
+        expanded={expanded === instrument_id}
         onChange={(e, ex) => {
           setExpanded(ex ? instrument_id : false);
           syncFileInfos();
@@ -458,7 +458,6 @@ export default function Upload({
               width: "100%",
               marginTop: -3,
               marginLeft: -2,
-              maxHeight: "",
               maxHeight: "50vh",
               overflowY: "auto",
             }}
