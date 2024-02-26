@@ -24,11 +24,11 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
     const action = event.action
     const matchKey = event.q1.question_index + "-" + event.q2.question_index
     var thisApiData = { ...apiData };
-    if (action == 'select') {
+    if (action === 'select') {
       if (Object.keys(thisApiData).includes('selectedMatches')) {
         if (thisApiData['selectedMatches'].includes(matchKey)) {
           thisApiData['selectedMatches'] = thisApiData['selectedMatches'].filter((e) => {
-            return e != matchKey
+            return e !== matchKey
           })
         } else {
           thisApiData['selectedMatches'].push(matchKey);
@@ -43,7 +43,7 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
         thisApiData['ignoredMatches'] = [matchKey];
       }
     }
-    if (action == 'report') {
+    if (action === 'report') {
       toaster.promise(
         new Promise((resolve, reject) => { reportMisMatch(event).then(ref => resolve(ref)).catch(e => reject(e)) }),
         {
@@ -126,7 +126,7 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
               (!resultsOptions.onlySelected || selectedMatches.includes(q.question_index + "-" + (i + 1 + q.question_index))) &&
               (resultsOptions.intraInstrument || (i + 1 + q.question_index) > instrument.maxqidx) &&
               Math.abs(e) >= (resultsOptions.threshold[0] / 100) && Math.abs(e) <= (resultsOptions.threshold[1] / 100) &&
-              (!liqeQuery || liqeQuery.type == "EmptyExpression" ||
+              (!liqeQuery || liqeQuery.type === "EmptyExpression" ||
                 safeTest(liqeQuery, {
                   question: q.question_text + "_" + mq.question_text,
                   instrument: q.instrument.name + "_" + mq.instrument.name,
@@ -177,7 +177,7 @@ export default function Results({ apiData, setApiData, setResultsOptions, result
     return apiData.instruments.map((i) => {
       return i.questions
     }).flat().filter((q) => {
-      return q.question_index == qidx
+      return q.question_index === qidx
     })[0]
   }
   return (

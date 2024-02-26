@@ -59,10 +59,10 @@ function App() {
     //default to intraInstrument ON in the case of just one instument in the model
     if (
       fileInfos &&
-      fileInfos.length == 1 &&
-      resultsOptions.intraInstrument == false
+      fileInfos.length === 1 &&
+      resultsOptions.intraInstrument === false
     ) {
-      var newResultsOptions = { ...resultsOptions };
+      let newResultsOptions = { ...resultsOptions };
       newResultsOptions.intraInstrument = true;
       newResultsOptions.intraInstrumentPreviousState =
         resultsOptions.intraInstrument;
@@ -75,7 +75,7 @@ function App() {
       fileInfos.length > 1 &&
       typeof resultsOptions.intraInstrumentPreviousState == "boolean"
     ) {
-      var newResultsOptions = { ...resultsOptions };
+      let newResultsOptions = { ...resultsOptions };
       newResultsOptions.intraInstrument =
         newResultsOptions.intraInstrumentPreviousState;
       delete newResultsOptions.intraInstrumentPreviousState;
@@ -114,7 +114,7 @@ function App() {
       })
       .flat()
       .filter((q) => {
-        return q.question_index == qidx;
+        return q.question_index === qidx;
       })[0];
   };
 
