@@ -61,7 +61,7 @@ export default function Upload({
     localFileInfos.current = fi;
   }, []);
 
-  const syncFileInfos = useCallback(() => {
+  const syncFileInfos = useCallback((setAppFileInfos) => {
     console.log("syncing fileinfo");
     setAppFileInfos(localFileInfos.current);
     dirty.current = false;
