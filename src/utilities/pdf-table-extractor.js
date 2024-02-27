@@ -2,7 +2,7 @@ import * as pdfjs from "pdfjs-dist/webpack.mjs";
 
 // HACK few hacks to let PDF.js be loaded not as a module in global space.
 function xmlEncode(s) {
-  var i = 0,
+  let i = 0,
     ch;
   s = String(s);
   while (
@@ -19,7 +19,7 @@ function xmlEncode(s) {
   if (i >= s.length) {
     return s;
   }
-  var buf = s.substring(0, i);
+  let buf = s.substring(0, i);
   while (i < s.length) {
     ch = s[i++];
     switch (ch) {
@@ -50,18 +50,18 @@ function xmlEncode(s) {
 }
 
 global.btoa = function btoa(chars) {
-  var digits =
+  let digits =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-  var buffer = "";
-  var i, n;
+  let buffer = "";
+  let i, n;
   for (i = 0, n = chars.length; i < n; i += 3) {
-    var b1 = chars.charCodeAt(i) & 0xff;
-    var b2 = chars.charCodeAt(i + 1) & 0xff;
-    var b3 = chars.charCodeAt(i + 2) & 0xff;
-    var d1 = b1 >> 2,
+    let b1 = chars.charCodeAt(i) & 0xff;
+    let b2 = chars.charCodeAt(i + 1) & 0xff;
+    let b3 = chars.charCodeAt(i + 2) & 0xff;
+    let d1 = b1 >> 2,
       d2 = ((b1 & 3) << 4) | (b2 >> 4);
-    var d3 = i + 1 < n ? ((b2 & 0xf) << 2) | (b3 >> 6) : 64;
-    var d4 = i + 2 < n ? b3 & 0x3f : 64;
+    let d3 = i + 1 < n ? ((b2 & 0xf) << 2) | (b3 >> 6) : 64;
+    let d4 = i + 2 < n ? b3 & 0x3f : 64;
     buffer +=
       digits.charAt(d1) +
       digits.charAt(d2) +
@@ -95,20 +95,20 @@ DOMElement.prototype = {
   },
 
   appendChild: function DOMElement_appendChild(element) {
-    var childNodes = this.childNodes;
+    let childNodes = this.childNodes;
     if (childNodes.indexOf(element) === -1) {
       childNodes.push(element);
     }
   },
 
   toString: function DOMElement_toString() {
-    var attrList = [];
-    for (var i in this.attributes) {
+    let attrList = [];
+    for (let i in this.attributes) {
       attrList.push(i + '="' + xmlEncode(this.attributes[i]) + '"');
     }
 
     if (this.nodeName === "svg:tspan" || this.nodeName === "svg:style") {
-      var encText = xmlEncode(this.textContent);
+      let encText = xmlEncode(this.textContent);
       return (
         "<" +
         this.nodeName +
@@ -121,7 +121,7 @@ DOMElement.prototype = {
         ">"
       );
     } else if (this.nodeName === "svg:svg") {
-      var ns =
+      let ns =
         'xmlns:xlink="http://www.w3.org/1999/xlink" ' +
         'xmlns:svg="http://www.w3.org/2000/svg"';
       return (
@@ -153,7 +153,7 @@ DOMElement.prototype = {
   },
 
   cloneNode: function DOMElement_cloneNode() {
-    var newNode = new DOMElement(this.nodeName);
+    let newNode = new DOMElement(this.nodeName);
     newNode.childNodes = this.childNodes;
     newNode.attributes = this.attributes;
     newNode.textContent = this.textContent;
@@ -169,13 +169,13 @@ const pdf_table_extractor_run = (pdfData) => {
   const pdf_table_extractor_progress = (result) => {};
 
   const pdf_table_extractor = (doc) => {
-    var numPages = doc.numPages;
-    var result = {};
+    let numPages = doc.numPages;
+    let result = {};
     result.pageTables = [];
     result.numPages = numPages;
     result.currentPages = 0;
 
-    var transform_fn = function (m1, m2) {
+    let transform_fn = function (m1, m2) {
       return [
         m1[0] * m2[0] + m1[2] * m2[1],
         m1[1] * m2[0] + m1[3] * m2[1],
@@ -186,45 +186,45 @@ const pdf_table_extractor_run = (pdfData) => {
       ];
     };
 
-    var applyTransform_fn = function (p, m) {
-      var xt = p[0] * m[0] + p[1] * m[2] + m[4];
-      var yt = p[0] * m[1] + p[1] * m[3] + m[5];
+    let applyTransform_fn = function (p, m) {
+      let xt = p[0] * m[0] + p[1] * m[2] + m[4];
+      let yt = p[0] * m[1] + p[1] * m[3] + m[5];
       return [xt, yt];
     };
 
-    var lastPromise = Promise.resolve(); // will be used to chain promises
-    var loadPage = function (pageNum) {
+    let lastPromise = Promise.resolve(); // will be used to chain promises
+    let loadPage = function (pageNum) {
       return doc.getPage(pageNum).then(function (page) {
-        var verticles = [];
-        var horizons = [];
-        var merges = {};
-        var merge_alias = {};
-        var transformMatrix = [1, 0, 0, 1, 0, 0];
-        var transformStack = [];
+        let verticles = [];
+        let horizons = [];
+        let merges = {};
+        let merge_alias = {};
+        let transformMatrix = [1, 0, 0, 1, 0, 0];
+        let transformStack = [];
 
         return page
           .getOperatorList()
           .then(function (opList) {
             // Get rectangle first
-            var showed = {};
-            var REVOPS = [];
-            for (var op in pdfjs.OPS) {
+            let showed = {};
+            let REVOPS = [];
+            for (let op in pdfjs.OPS) {
               REVOPS[pdfjs.OPS[op]] = op;
             }
 
-            var strokeRGBColor = null;
-            var fillRGBColor = null;
-            var current_x, current_y, lineWidth;
-            var edges = [];
-            var line_max_width = 2;
+            // let strokeRGBColor = null;
+            // let fillRGBColor = null;
+            let current_x, current_y, lineWidth;
+            let edges = [];
+            let line_max_width = 2;
 
             while (opList.fnArray.length) {
-              var fn = opList.fnArray.shift();
-              var args = opList.argsArray.shift();
-              if (pdfjs.OPS.constructPath == fn) {
+              let fn = opList.fnArray.shift();
+              let args = opList.argsArray.shift();
+              if (pdfjs.OPS.constructPath === fn) {
                 while (args[0].length) {
                   const op = args[0].shift();
-                  if (op == pdfjs.OPS.rectangle) {
+                  if (op === pdfjs.OPS.rectangle) {
                     const x = args[1].shift();
                     const y = args[1].shift();
                     const width = args[1].shift();
@@ -238,13 +238,13 @@ const pdf_table_extractor_run = (pdfData) => {
                         transform: transformMatrix,
                       });
                     }
-                  } else if (op == pdfjs.OPS.moveTo) {
+                  } else if (op === pdfjs.OPS.moveTo) {
                     current_x = args[1].shift();
                     current_y = args[1].shift();
-                  } else if (op == pdfjs.OPS.lineTo) {
+                  } else if (op === pdfjs.OPS.lineTo) {
                     const x = args[1].shift();
                     const y = args[1].shift();
-                    if (current_x == x) {
+                    if (current_x === x) {
                       edges.push({
                         y: Math.min(y, current_y),
                         x: x - lineWidth / 2,
@@ -252,7 +252,7 @@ const pdf_table_extractor_run = (pdfData) => {
                         height: Math.abs(y - current_y),
                         transform: transformMatrix,
                       });
-                    } else if (current_y == y) {
+                    } else if (current_y === y) {
                       edges.push({
                         x: Math.min(x, current_x),
                         y: y - lineWidth / 2,
@@ -267,17 +267,17 @@ const pdf_table_extractor_run = (pdfData) => {
                     // throw ('constructPath ' + op);
                   }
                 }
-              } else if (pdfjs.OPS.save == fn) {
+              } else if (pdfjs.OPS.save === fn) {
                 transformStack.push(transformMatrix);
-              } else if (pdfjs.OPS.restore == fn) {
+              } else if (pdfjs.OPS.restore === fn) {
                 transformMatrix = transformStack.pop();
-              } else if (pdfjs.OPS.transform == fn) {
+              } else if (pdfjs.OPS.transform === fn) {
                 transformMatrix = transform_fn(transformMatrix, args);
-              } else if (pdfjs.OPS.setStrokeRGBColor == fn) {
-                strokeRGBColor = args;
-              } else if (pdfjs.OPS.setFillRGBColor == fn) {
-                fillRGBColor = args;
-              } else if (pdfjs.OPS.setLineWidth == fn) {
+              } else if (pdfjs.OPS.setStrokeRGBColor === fn) {
+                // strokeRGBColor = args;
+              } else if (pdfjs.OPS.setFillRGBColor === fn) {
+                // fillRGBColor = args;
+              } else if (pdfjs.OPS.setLineWidth === fn) {
                 lineWidth = args[0];
               } else if (["eoFill"].indexOf(REVOPS[fn]) >= 0) {
               } else if ("undefined" === typeof showed[fn]) {
@@ -287,8 +287,8 @@ const pdf_table_extractor_run = (pdfData) => {
             }
 
             edges = edges.map(function (edge) {
-              var point1 = applyTransform_fn([edge.x, edge.y], edge.transform);
-              var point2 = applyTransform_fn(
+              let point1 = applyTransform_fn([edge.x, edge.y], edge.transform);
+              let point2 = applyTransform_fn(
                 [edge.x + edge.width, edge.y + edge.height],
                 edge.transform
               );
@@ -310,13 +310,11 @@ const pdf_table_extractor_run = (pdfData) => {
             });
 
             // get verticle lines
-            var current_x = null;
-            var current_y = null;
-            var current_height = 0;
-            var lines = [];
-            var lines_add_verticle = function (lines, top, bottom) {
-              var hit = false;
-              for (var i = 0; i < lines.length; i++) {
+            let current_height = 0;
+            let lines = [];
+            let lines_add_verticle = function (lines, top, bottom) {
+              let hit = false;
+              for (let i = 0; i < lines.length; i++) {
                 if (lines[i].bottom < top || lines[i].top > bottom) {
                   continue;
                 }
@@ -324,7 +322,7 @@ const pdf_table_extractor_run = (pdfData) => {
 
                 top = Math.min(lines[i].top, top);
                 bottom = Math.max(lines[i].bottom, bottom);
-                var new_lines = [];
+                let new_lines = [];
                 if (i > 1) {
                   new_lines = lines.slice(0, i - 1);
                 }
@@ -337,7 +335,7 @@ const pdf_table_extractor_run = (pdfData) => {
               }
               return lines;
             };
-            var edge;
+            let edge;
             while ((edge = edges1.shift())) {
               // skip horizon lines
               if (edge.width > line_max_width) {
@@ -385,7 +383,7 @@ const pdf_table_extractor_run = (pdfData) => {
             }
 
             // no table
-            if (current_x === null || lines.length == 0) {
+            if (current_x === null || lines.length === 0) {
               return {};
             }
             verticles.push({ x: current_x, lines: lines });
@@ -393,10 +391,10 @@ const pdf_table_extractor_run = (pdfData) => {
             // Get horizon lines
             current_x = null;
             current_y = null;
-            var current_width = 0;
-            var lines_add_horizon = function (lines, left, right) {
-              var hit = false;
-              for (var i = 0; i < lines.length; i++) {
+            let current_width = 0;
+            let lines_add_horizon = function (lines, left, right) {
+              let hit = false;
+              for (let i = 0; i < lines.length; i++) {
                 if (lines[i].right < left || lines[i].left > right) {
                   continue;
                 }
@@ -404,7 +402,7 @@ const pdf_table_extractor_run = (pdfData) => {
 
                 left = Math.min(lines[i].left, left);
                 right = Math.max(lines[i].right, right);
-                var new_lines = [];
+                let new_lines = [];
                 if (i > 1) {
                   new_lines = lines.slice(0, i - 1);
                 }
@@ -422,7 +420,7 @@ const pdf_table_extractor_run = (pdfData) => {
               if (edge.height > line_max_width) {
                 continue;
               }
-              if (null === current_y || edge.y - current_y > line_max_width) {
+              if (null == current_y || edge.y - current_y > line_max_width) {
                 if (current_width > line_max_width) {
                   lines = lines_add_horizon(
                     lines,
@@ -461,13 +459,13 @@ const pdf_table_extractor_run = (pdfData) => {
               );
             }
             // no table
-            if (current_y === null || lines.length == 0) {
+            if (current_y === null || lines.length === 0) {
               return {};
             }
             horizons.push({ y: current_y, lines: lines });
 
-            var search_index = function (v, list) {
-              for (var i = 0; i < list.length; i++) {
+            let search_index = function (v, list) {
+              for (let i = 0; i < list.length; i++) {
                 if (Math.abs(list[i] - v) < 5) {
                   return i;
                 }
@@ -481,39 +479,39 @@ const pdf_table_extractor_run = (pdfData) => {
             });
 
             // check top_out and bottom_out
-            var y_list = horizons
+            let y_list = horizons
               .map(function (a) {
                 return a.y;
               })
               .sort(function (a, b) {
                 return b - a;
               });
-            var y_max = verticles
+            let y_max = verticles
               .map(function (verticle) {
                 return verticle.lines[0].bottom;
               })
               .sort()
               .reverse()[0];
-            var y_min = verticles
+            let y_min = verticles
               .map(function (verticle) {
                 return verticle.lines[verticle.lines.length - 1].top;
               })
               .sort()[0];
-            var top_out = search_index(y_min, y_list) == -1 ? 1 : 0;
-            var bottom_out = search_index(y_max, y_list) == -1 ? 1 : 0;
+            let top_out = search_index(y_min, y_list) === -1 ? 1 : 0;
+            let bottom_out = search_index(y_max, y_list) === -1 ? 1 : 0;
 
-            var verticle_merges = {};
+            let verticle_merges = {};
             // skip the 1st lines and final lines
             for (
-              var r = 0;
+              let r = 0;
               r < horizons.length - 2 + top_out + bottom_out;
               r++
             ) {
               const hor = horizons[bottom_out + horizons.length - r - 2];
               lines = hor.lines.slice(0);
-              var col = search_index(lines[0].left, x_list);
-              if (col != 0) {
-                for (var c = 0; c < col; c++) {
+              let col = search_index(lines[0].left, x_list);
+              if (col !== 0) {
+                for (let c = 0; c < col; c++) {
                   verticle_merges[[r, c].join("-")] = {
                     row: r,
                     col: c,
@@ -522,12 +520,12 @@ const pdf_table_extractor_run = (pdfData) => {
                   };
                 }
               }
-              var line;
+              let line;
               while ((line = lines.shift())) {
                 const left_col = search_index(line.left, x_list);
                 const right_col = search_index(line.right, x_list);
-                if (left_col != col) {
-                  for (var c = col; c < left_col; c++) {
+                if (left_col !== col) {
+                  for (let c = col; c < left_col; c++) {
                     verticle_merges[[r, c].join("-")] = {
                       row: r,
                       col: c,
@@ -538,8 +536,8 @@ const pdf_table_extractor_run = (pdfData) => {
                 }
                 col = right_col;
               }
-              if (col != verticles.length - 1 + top_out) {
-                for (var c = col; c < verticles.length - 1 + top_out; c++) {
+              if (col !== verticles.length - 1 + top_out) {
+                for (let c = col; c < verticles.length - 1 + top_out; c++) {
                   verticle_merges[[r, c].join("-")] = {
                     row: r,
                     col: c,
@@ -551,10 +549,10 @@ const pdf_table_extractor_run = (pdfData) => {
             }
 
             while (true) {
-              var merged = false;
-              for (var r_c in verticle_merges) {
-                var m = verticle_merges[r_c];
-                var final_id = [m.row + m.height - 1, m.col + m.width - 1].join(
+              let merged = false;
+              for (let r_c in verticle_merges) {
+                let m = verticle_merges[r_c];
+                let final_id = [m.row + m.height - 1, m.col + m.width - 1].join(
                   "-"
                 );
                 if ("undefined" !== typeof verticle_merges[final_id]) {
@@ -570,14 +568,14 @@ const pdf_table_extractor_run = (pdfData) => {
               }
             }
 
-            var horizon_merges = {};
+            let horizon_merges = {};
 
-            for (var c = 0; c < verticles.length - 2; c++) {
+            for (let c = 0; c < verticles.length - 2; c++) {
               const ver = verticles[c + 1];
               lines = ver.lines.slice(0);
-              var row = search_index(lines[0].bottom, y_list) + bottom_out;
-              if (row != 0) {
-                for (var r = 0; r < row; r++) {
+              let row = search_index(lines[0].bottom, y_list) + bottom_out;
+              if (row !== 0) {
+                for (let r = 0; r < row; r++) {
                   horizon_merges[[r, c].join("-")] = {
                     row: r,
                     col: c,
@@ -586,16 +584,17 @@ const pdf_table_extractor_run = (pdfData) => {
                   };
                 }
               }
+              let line;
               while ((line = lines.shift())) {
                 let top_row = search_index(line.top, y_list);
-                if (top_row == -1) {
+                if (top_row === -1) {
                   top_row = y_list.length + bottom_out;
                 } else {
                   top_row += bottom_out;
                 }
                 let bottom_row = search_index(line.bottom, y_list) + bottom_out;
-                if (bottom_row != row) {
-                  for (var r = bottom_row; r < row; r++) {
+                if (bottom_row !== row) {
+                  for (let r = bottom_row; r < row; r++) {
                     horizon_merges[[r, c].join("-")] = {
                       row: r,
                       col: c,
@@ -606,9 +605,9 @@ const pdf_table_extractor_run = (pdfData) => {
                 }
                 row = top_row;
               }
-              if (row != horizons.length - 1 + bottom_out + top_out) {
+              if (row !== horizons.length - 1 + bottom_out + top_out) {
                 for (
-                  var r = row;
+                  let r = row;
                   r < horizons.length - 1 + bottom_out + top_out;
                   r++
                 ) {
@@ -629,10 +628,10 @@ const pdf_table_extractor_run = (pdfData) => {
             }
 
             while (true) {
-              var merged = false;
-              for (var r_c in horizon_merges) {
-                var m = horizon_merges[r_c];
-                var final_id = [m.row + m.height - 1, m.col + m.width - 1].join(
+              let merged = false;
+              for (let r_c in horizon_merges) {
+                let m = horizon_merges[r_c];
+                let final_id = [m.row + m.height - 1, m.col + m.width - 1].join(
                   "-"
                 );
                 if ("undefined" !== typeof horizon_merges[final_id]) {
@@ -648,17 +647,17 @@ const pdf_table_extractor_run = (pdfData) => {
               }
             }
             merges = verticle_merges;
-            for (var id in horizon_merges) {
+            for (let id in horizon_merges) {
               if ("undefined" !== typeof merges[id]) {
                 merges[id].width = horizon_merges[id].width;
               } else {
                 merges[id] = horizon_merges[id];
               }
             }
-            for (var id in merges) {
-              for (var c = 0; c < merges[id].width; c++) {
-                for (var r = 0; r < merges[id].height; r++) {
-                  if (c == 0 && r == 0) {
+            for (let id in merges) {
+              for (let c = 0; c < merges[id].width; c++) {
+                for (let r = 0; r < merges[id].height; r++) {
+                  if (c === 0 && r === 0) {
                     continue;
                   }
                   delete merges[
@@ -669,10 +668,10 @@ const pdf_table_extractor_run = (pdfData) => {
             }
 
             merge_alias = {};
-            for (var id in merges) {
-              for (var c = 0; c < merges[id].width; c++) {
-                for (var r = 0; r < merges[id].height; r++) {
-                  if (r == 0 && c == 0) {
+            for (let id in merges) {
+              for (let c = 0; c < merges[id].width; c++) {
+                for (let r = 0; r < merges[id].height; r++) {
+                  if (r === 0 && c === 0) {
                     continue;
                   }
                   merge_alias[
@@ -686,37 +685,37 @@ const pdf_table_extractor_run = (pdfData) => {
             return page.getTextContent().then(function (content) {
               const tables = [];
               const table_pos = [];
-              for (var i = 0; i < horizons.length - 1; i++) {
+              for (let i = 0; i < horizons.length - 1; i++) {
                 tables[i] = [];
                 table_pos[i] = [];
-                for (var j = 0; j < verticles.length - 1; j++) {
+                for (let j = 0; j < verticles.length - 1; j++) {
                   tables[i][j] = "";
                   table_pos[i][j] = null;
                 }
               }
-              var item;
+              let item;
               while ((item = content.items.shift())) {
                 const x = item.transform[4];
                 const y = item.transform[5];
 
-                var col = -1;
-                for (var i = 0; i < verticles.length - 1; i++) {
+                let col = -1;
+                for (let i = 0; i < verticles.length - 1; i++) {
                   if (x >= verticles[i].x && x < verticles[i + 1].x) {
                     col = i;
                     break;
                   }
                 }
-                if (col == -1) {
+                if (col === -1) {
                   continue;
                 }
-                var row = -1;
-                for (var i = 0; i < horizons.length - 1; i++) {
+                let row = -1;
+                for (let i = 0; i < horizons.length - 1; i++) {
                   if (y >= horizons[i].y && y < horizons[i + 1].y) {
                     row = horizons.length - i - 2;
                     break;
                   }
                 }
-                if (row == -1) {
+                if (row === -1) {
                   continue;
                 }
 
@@ -753,7 +752,7 @@ const pdf_table_extractor_run = (pdfData) => {
       });
     };
 
-    for (var i = 1; i <= numPages; i++) {
+    for (let i = 1; i <= numPages; i++) {
       lastPromise = lastPromise.then(loadPage.bind(null, i));
     }
     return lastPromise.then(function () {
