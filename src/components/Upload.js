@@ -61,11 +61,11 @@ export default function Upload({
     localFileInfos.current = fi;
   }, []);
 
-  const syncFileInfos = useCallback((setAppFileInfos) => {
+  const syncFileInfos = useCallback(() => {
     console.log("syncing fileinfo");
     setAppFileInfos(localFileInfos.current);
     dirty.current = false;
-  }, []);
+  }, [setAppFileInfos]);
 
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
@@ -173,7 +173,7 @@ export default function Upload({
         ) {
           return fi;
         } else {
-          return null
+          return null;
         }
       })
       .filter((i) => {

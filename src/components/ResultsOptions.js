@@ -36,7 +36,7 @@ export default function ResultsOptions({
     setSearchTerm(resultsOptions.searchTerm);
   }, [resultsOptions]);
 
-  useMemo((resultsOptions, setResultsOptions) => {
+  useMemo(() => {
     let thisOptions = { ...resultsOptions };
     thisOptions.searchTerm = debouncedSearchTerm;
     setResultsOptions(thisOptions);
@@ -120,9 +120,9 @@ export default function ResultsOptions({
           </Typography>
           <Switch
             checked={resultsOptions.intraInstrument}
-            onChange={(e, value) => {
+            onChange={(event) => {
               let thisOptions = { ...resultsOptions };
-              thisOptions.intraInstrument = value;
+              thisOptions.intraInstrument = event.target.checked;
               setResultsOptions(thisOptions);
             }}
           />
@@ -138,9 +138,9 @@ export default function ResultsOptions({
           <Typography id="withinInstruments">Just selected matches</Typography>
           <Switch
             checked={resultsOptions.onlySelected}
-            onChange={(e, value) => {
+            onChange={(event) => {
               let thisOptions = { ...resultsOptions };
-              thisOptions.onlySelected = value;
+              thisOptions.onlySelected = event.target.checked;
               setResultsOptions(thisOptions);
             }}
           />
