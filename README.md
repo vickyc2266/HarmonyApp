@@ -44,10 +44,11 @@ You can access Harmony in your browser at `http://localhost:3000/app#/`.
 
 Run the [Harmony API](https://github.com/harmonydata/harmonyapi) app in Python.
 
-Open `.env` and change `REACT_APP_API_URL` to `http://localhost:8000`:
+Open `.env` and change `REACT_APP_API_URL` to `http://localhost:8000` and change `REACT_APP_ABSOLUTE_URL_PREFIX` to `http://localhost:8000/app` (so that the front end knows that it's running on localhost and that it should connect to a localhost API)
 
 ```
 REACT_APP_API_URL=http://localhost:8000
+REACT_APP_ABSOLUTE_URL_PREFIX=http://localhost:8000/app
 ```
 
 Then run `npm install; npm start` as usual.
