@@ -23,6 +23,94 @@ export const useData = () => {
 export function DataProvider({ children }) {
   const { currentUser } = useAuth();
 
+  const retryablePostData = ({ url = "", data = {}, timeout = 8000 }) => {
+    return new Promise(async (resolve, reject) => {
+      var retries = 3;
+      var response;
+      while (retries > 0 && !(response && response.ok)) {
+        try {
+          const controller = new AbortController();
+          const id = setTimeout(() => controller.abort(), timeout);
+          response = await fetch(url, {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(data),
+            signal: controller.signal,
+          });
+          clearTimeout(id);
+        } catch (e) {
+          console.log(e);
+          reject(e);
+        }
+        retries--;
+      }
+      resolve(response.json());
+    });
+  };
+  const retryableGetData = async ({ url = "", timeout = 5000 }) => {
+    return new Promise(async (resolve, reject) => {
+      var retries = 3;
+      var response;
+      while (retries > 0 && !(response && response.ok)) {
+        try {
+          const controller = new AbortController();
+          const id = setTimeout(() => controller.abort(), timeout);
+          response = await fetch(url, {
+            method: "GET",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            signal: controller.signal,
+          });
+          clearTimeout(id);
+        } catch (e) {
+          console.log(e);
+          reject(e);
+        }
+        retries--;
+      }
+      resolve(response.json());
+    });
+  };
+  const parse = (allFiles) => {
+    return retryablePostData({
+      url: process.env.REACT_APP_API_PARSE,
+      data: allFiles,
+      timeout: 15000,
+    });
+  };
+  const match = (instruments) => {
+    return retryablePostData({
+      url: process.env.REACT_APP_API_MATCH,
+      data: { instruments: instruments },
+      timeout: 30000,
+    });
+  };
+  const exampleInstruments = () => {
+    return retryablePostData({
+      url: process.env.REACT_APP_API_EXAMPLES,
+      timeout: 5000,
+    });
+  };
+  const getVersion = () => {
+    return retryableGetData({
+      url: process.env.REACT_APP_API_VERSION,
+      timeout: 500,
+    }).then((data) => data.harmony_version || "unknown");
+  };
+
   const getPublicHarmonisations = async (docID) => {
     if (docID) {
       const docRef = doc(db, "harmonisations", docID);
@@ -54,7 +142,7 @@ export function DataProvider({ children }) {
     r.rating = rating;
     r.created = serverTimestamp();
     return addDoc(collection(db, "ratings"), r);
-  }
+  };
 
   const getMyHarmonisations = async () => {
     const q = query(
@@ -107,23 +195,22 @@ export function DataProvider({ children }) {
     m.q2.instrument_name = m.q2.instrument.name;
     m.q1.instrument_id = m.q1.instrument.id;
     m.q2.instrument_id = m.q2.instrument.id;
-    m.match_reported = mismatch.match
+    m.match_reported = mismatch.match;
     delete m.q1.instrument;
     delete m.q2.instrument;
-    delete m.q1.nearest_match_from_mhc_auto
-    delete m.q2.nearest_match_from_mhc_auto
+    delete m.q1.nearest_match_from_mhc_auto;
+    delete m.q2.nearest_match_from_mhc_auto;
     m.created = serverTimestamp();
 
     return addDoc(collection(db, "mismatches"), m);
   };
   const prepForFireStore = (harmonisation) => {
-    harmonisation.apiData.instruments.map((instrument) => (
-      instrument.questions.map((question) => (
-        //This is a circular reference but can't be stored
-        delete question["instrument"]
-        )
+    harmonisation.apiData.instruments.map((instrument) =>
+      instrument.questions.map(
+        (question) =>
+          //This is a circular reference but can't be stored
+          delete question["instrument"]
       )
-    )
     );
     harmonisation.apiData = JSON.parse(JSON.stringify(harmonisation.apiData));
     console.log("prepped");
@@ -131,13 +218,12 @@ export function DataProvider({ children }) {
     return harmonisation;
   };
   const undoPrepForFireStore = (harmonisation) => {
-    harmonisation.apiData.instruments.map((instrument) => (
-      instrument.questions.map((question) => (
-        //This is a circular reference but can't be stored
-        question["instrument"] = instrument
-        )
+    harmonisation.apiData.instruments.map((instrument) =>
+      instrument.questions.map(
+        (question) =>
+          //This is a circular reference but can't be stored
+          (question["instrument"] = instrument)
       )
-    )
     );
     console.log("unprepped");
     console.log(harmonisation);
@@ -147,12 +233,16 @@ export function DataProvider({ children }) {
   return (
     <DataProviderContext.Provider
       value={{
+        exampleInstruments,
+        parse,
+        match,
+        getVersion,
         storeHarmonisation,
         getMyHarmonisations,
         getPublicHarmonisations,
         reportMisMatch,
         prepForFireStore,
-        reportRating
+        reportRating,
       }}
     >
       {children}

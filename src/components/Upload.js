@@ -1,6 +1,6 @@
 import React, { useState, useRef, memo, useMemo, useCallback } from "react";
 import DragDrop from "./DragDrop";
-import postData from "../utilities/postData";
+import { useData } from "../contexts/DataContext";
 import {
   Box,
   Accordion,
@@ -45,6 +45,7 @@ export default function Upload({
   const dirty = useRef(false);
   const localFileInfos = useRef();
   const history = useHistory();
+  const { match, parse } = useData();
   ReactGA.send({
     hitType: "pageview",
     page: "/",
@@ -124,7 +125,7 @@ export default function Upload({
       .then((allFiles) => {
         toast.promise(
           new Promise((resolve, reject) => {
-            postData(process.env.REACT_APP_API_PARSE, allFiles, 15000)
+            parse(allFiles)
               .then((data) => {
                 const newFileInfos = [...fileInfos];
                 // Load each returned file / instrument in the data
@@ -544,11 +545,7 @@ export default function Upload({
         disabled={!fileInfos || fileInfos.length === 0 || loading}
         onClick={() => {
           setLoading(true);
-          postData(
-            process.env.REACT_APP_API_MATCH,
-            { instruments: fileInfos },
-            30000
-          )
+          match(fileInfos)
             .then((data) => {
               let simpleApi = simplifyApi(data, fileInfos);
               setApiData(simpleApi);
