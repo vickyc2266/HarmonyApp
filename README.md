@@ -25,7 +25,7 @@ This is the app in React which is running at https://harmonydata.ac.uk/app. It i
 
 ## Installing on your local machine
 
-[https://www.youtube.com/watch?v=1xp3Uh6dptg](YouTube video on installing and running the app in Windows)
+[YouTube video on installing and running the app in Windows](https://www.youtube.com/watch?v=1xp3Uh6dptg)
 
 ## How to run Harmony's Node.js front end.
 
