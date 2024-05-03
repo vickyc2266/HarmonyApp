@@ -1,6 +1,6 @@
 # build and deploy release branch to GH pages
 
-name: Build and Deploy to GH pages
+name: Build and Deploy Release branch to GH pages
 
 
 # after the next release this should be updated to true
@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: "release"
       - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
