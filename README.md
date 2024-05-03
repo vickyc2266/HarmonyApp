@@ -57,6 +57,14 @@ Then run `npm install; npm start` as usual.
 
 You can contact Harmony team at https://harmonydata.ac.uk/, Thomas Wood at http://fastdatascience.com/ or John Rogers at http://delosis.com
 
+## Deployment
+
+This app is deployed using Github actions when there is a push to `main` branch. The script to do this is under folder `.github`.
+
+Ulster University is managing the domain `harmonydata.ac.uk` which is configured to point to the IPs of the Github Pages deployment.
+
+For the staging app we are using a Netlify build with build hooks - please contact Thomas Wood/John Rogers for details.
+
 # How to contribute
 
 You can raise an issue in the [issue tracker](https://github.com/harmonydata/harmony/issues), and you can open a [pull request](https://github.com/harmonydata/harmony/pulls).
