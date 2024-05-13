@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /harmonisations/{document} {
+      // allow read access to own or public 
+      allow read: if resource.data.public == true || resource.data.uid == request.auth.uid; 
+      // write access to own
+      allow write: if resource.data.uid == request.auth.uid; 
+      // create access to any logged in
+      allow create: if request.auth != null; 
+  	}
+    match /mismatches/{document} {
+      // allow create access to public 
+      allow create, write: if true ; 
+  	}
+     match /ratings/{document} {
+      // allow create access to public 
+      allow create, write: if true ; 
+  	}
+  }
+}

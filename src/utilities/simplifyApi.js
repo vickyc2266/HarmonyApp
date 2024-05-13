@@ -22,7 +22,7 @@ export function simplifyApi(apiResult, apiCall) {
         options: q.options,
         nearest_match_from_mhc_auto:
           apiResult.questions[qidx].nearest_match_from_mhc_auto,
-        topics_auto: apiResult.questions[qidx].topics_auto || [],
+        topics_strengths: apiResult.questions[qidx].topics_strengths || {},
         matches: apiResult.matches[qidx].slice(qidx + 1),
       });
       instrument.addQuestion(question);

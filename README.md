@@ -63,11 +63,15 @@ You can contact Harmony team at https://harmonydata.ac.uk/, Thomas Wood at http:
 
 ## Deployment
 
-This app is deployed using Github actions when there is a push to `main` branch. The script to do this is under folder `.github`.
+Commits / pull requests to the master or staging branches will trigger an automatic build on netlifiy - temporay build URLS will be displayed in pull requests and please manually confirm your commits are working as intended.
+
+The staging branch is always available at https://harmony-staging.netlify.app/
+
+This app is deployed to the main website using Github actions when there is a push to `releases` branch - this is a protected branch. The script to do this is under folder `.github`.
 
 Ulster University is managing the domain `harmonydata.ac.uk` which is configured to point to the IPs of the Github Pages deployment.
 
-For the staging app we are using a Netlify build with build hooks - please contact Thomas Wood/John Rogers for details.
+
 
 # How to contribute
 
