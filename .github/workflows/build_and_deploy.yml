@@ -1,17 +1,18 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# build and deploy release branch to GH pages
 
-name: Build and Deploy to GH pages
+name: Build and Deploy Release branch to GH pages
 
+
+# after the next release this should be updated to true
 env:
   CI: false
 
 on:
   push:
-    branches: ["master"]
+    branches: ["release"]
   pull_request:
     types: closed
-    branches: ["master"]
+    branches: ["release"]
   workflow_dispatch:
 
 jobs:
@@ -19,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: "release"
       - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:

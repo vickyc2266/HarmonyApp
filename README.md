@@ -23,6 +23,10 @@ This is the app in React which is running at https://harmonydata.ac.uk/app. It i
 * 🪧 The Harmony R library source code is here: https://github.com/harmonydata/harmony_r.
 * 🪧 The Harmony API source code is here: https://github.com/harmonydata/harmonyapi.
 
+## Installing on your local machine
+
+[YouTube video on installing and running the app in Windows](https://www.youtube.com/watch?v=1xp3Uh6dptg)
+
 ## How to run Harmony's Node.js front end.
 
 First you need the [API server](https://github.com/harmonydata/harmonyapi) running. Download, install and start the Harmony API. The Node.js front end will connect to the API server.
@@ -56,6 +60,18 @@ Then run `npm install; npm start` as usual.
 ## Who to contact?
 
 You can contact Harmony team at https://harmonydata.ac.uk/, Thomas Wood at http://fastdatascience.com/ or John Rogers at http://delosis.com
+
+## Deployment
+
+Commits / pull requests to the master or staging branches will trigger an automatic build on netlifiy - temporay build URLS will be displayed in pull requests and please manually confirm your commits are working as intended.
+
+The staging branch is always available at https://harmony-staging.netlify.app/
+
+This app is deployed to the main website using Github actions when there is a push to `releases` branch - this is a protected branch. The script to do this is under folder `.github`.
+
+Ulster University is managing the domain `harmonydata.ac.uk` which is configured to point to the IPs of the Github Pages deployment.
+
+
 
 # How to contribute
 
