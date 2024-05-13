@@ -4,3 +4,5 @@
 package-lock.json
 /wireframes
 package-lock.json
+functions/venv
+functions/__pycache__
