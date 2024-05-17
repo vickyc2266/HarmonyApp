@@ -57,12 +57,18 @@ export default function Upload({
   }, [appFileInfos]);
 
   const setFileInfos = useCallback(
-    (fi) => {
+    (fi, forceExpanded) => {
       console.log("setting local FI " + JSON.stringify(fi));
       dirty.current = dirty.current + 1;
       localFileInfos.current = fi;
-      if (!(expanded && fi.map((i) => i.instrument_id).includes(expanded)))
+      if (forceExpanded) {
+        setExpanded(forceExpanded);
+      } else if (
+        fi.length &&
+        !(expanded && fi.map((i) => i.instrument_id).includes(expanded))
+      ) {
         setExpanded(fi[0].instrument_id);
+      }
     },
     [expanded, setExpanded]
   );
@@ -227,18 +233,18 @@ export default function Upload({
     const after = fileInfos.findIndex(
       (f) => f.instrument_id === after_instrument_id
     );
+    const instrument_id = "ManuallyCreated" + String(new Date().getTime());
     const newFileInfos = fileInfos
       .slice(0, after + 1)
       .concat([
         {
-          instrument_id: String(new Date().getTime()),
+          instrument_id: instrument_id,
           instrument_name: "",
           questions: [{ question_no: "", question_text: "" }],
         },
       ])
       .concat(fileInfos.slice(after + 1));
-    console.log(newFileInfos);
-    setFileInfos(newFileInfos);
+    setFileInfos(newFileInfos, instrument_id);
     syncFileInfos();
   };
 
@@ -404,6 +410,16 @@ export default function Upload({
           }}
         >
           <TextField
+            error={
+              fi.questions.reduce((a, q) => (a = a + q.question_text), "")
+                .length === 0
+            }
+            helperText={
+              fi.questions.reduce((a, q) => (a = a + q.question_text), "")
+                .length === 0
+                ? "You must add questions before this will be harmonised"
+                : false
+            }
             variant="standard"
             sx={{
               pointerEvents: "auto",
