@@ -56,11 +56,16 @@ export default function Upload({
     return dirty.current ? localFileInfos.current || [] : appFileInfos || [];
   }, [appFileInfos]);
 
-  const setFileInfos = useCallback((fi) => {
-    console.log("setting local FI " + JSON.stringify(fi));
-    dirty.current = dirty.current + 1;
-    localFileInfos.current = fi;
-  }, []);
+  const setFileInfos = useCallback(
+    (fi) => {
+      console.log("setting local FI " + JSON.stringify(fi));
+      dirty.current = dirty.current + 1;
+      localFileInfos.current = fi;
+      if (!(expanded && fi.map((i) => i.instrument_id).includes(expanded)))
+        setExpanded(fi[0].instrument_id);
+    },
+    [expanded, setExpanded]
+  );
 
   const syncFileInfos = useCallback(() => {
     console.log("syncing fileinfo");
@@ -375,7 +380,7 @@ export default function Upload({
         key={instrument_id}
         expanded={expanded === instrument_id}
         onChange={(e, ex) => {
-          setExpanded(ex ? instrument_id : false);
+          if (ex) setExpanded(instrument_id);
           syncFileInfos();
         }}
       >
