@@ -1,5 +1,6 @@
 import React, { useState, useRef, memo, useMemo, useCallback } from "react";
 import DragDrop from "./DragDrop";
+import GoogleDriveImport from "./GoogleDriveImport";
 import { useData } from "../contexts/DataContext";
 import {
   Box,
@@ -29,6 +30,7 @@ import { simplifyApi } from "../utilities/simplifyApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import pdfTableExtractor from "../utilities/pdf-table-extractor";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Upload({
   appFileInfos,
@@ -37,6 +39,7 @@ export default function Upload({
   existingInstruments,
   ReactGA,
 }) {
+  const { currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
@@ -521,7 +524,17 @@ export default function Upload({
         setState={setMatchError}
       />
 
-      <DragDrop filesReceiver={filesReceiver} sx={{ margin: "2rem" }} />
+      <DragDrop filesReceiver={filesReceiver} sx={{ mt: "2rem" }} />
+      {currentUser &&
+        currentUser.providerData &&
+        currentUser.providerData
+          .map((p) => p.providerId)
+          .includes("google.com") && (
+          <GoogleDriveImport
+            filesReceiver={filesReceiver}
+            sx={{ display: "flex", width: "100%", mt: "1rem" }}
+          />
+        )}
       <Stack
         direction={"row"}
         spacing={1}
