@@ -22,7 +22,10 @@ export const useData = () => {
 
 export function DataProvider({ children }) {
   const { currentUser } = useAuth();
-
+  const [currentModel, setCurrentModel] = React.useState({
+    framework: "azure_openai",
+    model: "fds-text-embedding-ada-002",
+  });
   const retryablePostData = ({ url = "", data = {}, timeout = 8000 }) => {
     return new Promise(async (resolve, reject) => {
       var retries = 3;
@@ -94,7 +97,7 @@ export function DataProvider({ children }) {
   const match = (instruments) => {
     return retryablePostData({
       url: process.env.REACT_APP_API_MATCH,
-      data: { instruments: instruments },
+      data: { instruments: instruments, parameters: currentModel },
       timeout: 30000,
     });
   };
@@ -107,8 +110,14 @@ export function DataProvider({ children }) {
   const getVersion = () => {
     return retryableGetData({
       url: process.env.REACT_APP_API_VERSION,
-      timeout: 500,
+      timeout: 800,
     }).then((data) => data.harmony_version || "unknown");
+  };
+  const getModels = () => {
+    return retryableGetData({
+      url: process.env.REACT_APP_API_MODELS,
+      timeout: 800,
+    });
   };
 
   const getPublicHarmonisations = async (docID) => {
@@ -200,6 +209,7 @@ export function DataProvider({ children }) {
     delete m.q2.instrument;
     delete m.q1.nearest_match_from_mhc_auto;
     delete m.q2.nearest_match_from_mhc_auto;
+    m.model_used = currentModel;
     m.created = serverTimestamp();
 
     return addDoc(collection(db, "mismatches"), m);
@@ -237,6 +247,9 @@ export function DataProvider({ children }) {
         parse,
         match,
         getVersion,
+        getModels,
+        currentModel,
+        setCurrentModel,
         storeHarmonisation,
         getMyHarmonisations,
         getPublicHarmonisations,
