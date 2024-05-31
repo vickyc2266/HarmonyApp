@@ -23,8 +23,8 @@ export const useData = () => {
 export function DataProvider({ children }) {
   const { currentUser } = useAuth();
   const [currentModel, setCurrentModel] = React.useState({
-    framework: "azure_openai",
-    model: "fds-text-embedding-ada-002",
+    framework: "huggingface",
+    model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
   });
   const retryablePostData = ({ url = "", data = {}, timeout = 8000 }) => {
     return new Promise(async (resolve, reject) => {
