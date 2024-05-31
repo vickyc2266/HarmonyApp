@@ -11,6 +11,10 @@ import {
   Menu,
   Container,
   Divider,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  ListItemText,
 } from "@mui/material";
 import { Logout, JoinInner } from "@mui/icons-material/";
 import { useAuth } from "../contexts/AuthContext";
@@ -28,6 +32,7 @@ const SettingsIcons = {
 function HarmonyAppBar() {
   const [anchorUser, setAnchorUser] = React.useState(null);
   const [apiVersion, setApiVersion] = React.useState(null);
+  const [allModels, setAllModels] = React.useState();
   const [error, setError] = React.useState(null);
   const {
     currentUser,
@@ -36,7 +41,7 @@ function HarmonyAppBar() {
     signInWithGitHub,
     signInWithTwitter,
   } = useAuth();
-  const { getVersion } = useData();
+  const { getVersion, getModels, currentModel, setCurrentModel } = useData();
 
   React.useEffect(() => {
     getVersion()
@@ -45,6 +50,24 @@ function HarmonyAppBar() {
       })
       .catch((e) => setError("ERROR: API unreachable"));
   }, [getVersion]);
+
+  React.useEffect(() => {
+    getModels()
+      .then((models) => {
+        setAllModels(models);
+      })
+      .catch((e) => setError("ERROR: API unreachable"));
+  }, [getModels]);
+
+  const handleModelSelect = (event) => {
+    const model = event.target.value;
+    if (
+      model.framework !== currentModel.framework ||
+      model.model !== currentModel.model
+    ) {
+      setCurrentModel(model);
+    }
+  };
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -80,15 +103,27 @@ function HarmonyAppBar() {
     >
       <Container sx={{ maxWidth: "100%!important" }}>
         <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1, textAlign: "right", paddingRight: 2 }}>
-            {apiVersion && (
-              <Typography>Harmony API version: {apiVersion}</Typography>
-            )}
-            {error && (
-              <Typography sx={{ color: "red", fontWeight: 900 }}>
-                {error}
-              </Typography>
-            )}
+          <Box
+            sx={{
+              flexGrow: 1,
+
+              textAlign: "right",
+              paddingRight: 2,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyItems: "flex-end",
+              }}
+            >
+              {error && (
+                <Typography sx={{ color: "red", fontWeight: 900 }}>
+                  {error}
+                </Typography>
+              )}
+            </Box>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
@@ -105,7 +140,7 @@ function HarmonyAppBar() {
               </Avatar>
             </Tooltip>
             <Menu
-              sx={{ mt: "45px" }}
+              sx={{ mt: "45px", maxWidth: "50%" }}
               id="menu-appbar"
               anchorEl={anchorUser}
               anchorOrigin={{
@@ -133,6 +168,41 @@ function HarmonyAppBar() {
                   <MenuItem value={"EN"}>English</MenuItem>
                   <MenuItem value={"PT"}>Portuguese</MenuItem>
                 </Select>
+              </MenuItem>
+              <MenuItem key="model">
+                <FormControl sx={{ margin: "auto" }}>
+                  <InputLabel id="models">Model</InputLabel>
+                  <Select
+                    size="small"
+                    labelId="models"
+                    id="modelcombo"
+                    value={currentModel}
+                    onChange={handleModelSelect}
+                    input={
+                      <OutlinedInput
+                        sx={{ overflow: "hidden" }}
+                        label="Model"
+                      />
+                    }
+                    renderValue={(selected) =>
+                      selected.framework + " (" + selected.model + ")"
+                    }
+                  >
+                    {allModels &&
+                      allModels.map(
+                        (model) =>
+                          model.available && (
+                            <MenuItem key={model.model} value={model}>
+                              <ListItemText
+                                primary={
+                                  model.framework + " (" + model.model + ")"
+                                }
+                              />
+                            </MenuItem>
+                          )
+                      )}
+                  </Select>
+                </FormControl>
               </MenuItem>
               <Divider />
 
@@ -188,6 +258,12 @@ function HarmonyAppBar() {
                     Sign in with Twitter
                   </Typography>
                 </MenuItem>
+              )}
+              <Divider />
+              {apiVersion && (
+                <Typography sx={{ mx: 1 }}>
+                  Harmony API version: {apiVersion}
+                </Typography>
               )}
             </Menu>
           </Box>

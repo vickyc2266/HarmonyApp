@@ -1,5 +1,6 @@
 import React, { useState, useRef, memo, useMemo, useCallback } from "react";
 import DragDrop from "./DragDrop";
+import GoogleDriveImport from "./GoogleDriveImport";
 import { useData } from "../contexts/DataContext";
 import {
   Box,
@@ -29,6 +30,7 @@ import { simplifyApi } from "../utilities/simplifyApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import pdfTableExtractor from "../utilities/pdf-table-extractor";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Upload({
   appFileInfos,
@@ -37,6 +39,7 @@ export default function Upload({
   existingInstruments,
   ReactGA,
 }) {
+  const { currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
@@ -56,11 +59,22 @@ export default function Upload({
     return dirty.current ? localFileInfos.current || [] : appFileInfos || [];
   }, [appFileInfos]);
 
-  const setFileInfos = useCallback((fi) => {
-    console.log("setting local FI " + JSON.stringify(fi));
-    dirty.current = dirty.current + 1;
-    localFileInfos.current = fi;
-  }, []);
+  const setFileInfos = useCallback(
+    (fi, forceExpanded) => {
+      console.log("setting local FI " + JSON.stringify(fi));
+      dirty.current = dirty.current + 1;
+      localFileInfos.current = fi;
+      if (forceExpanded) {
+        setExpanded(forceExpanded);
+      } else if (
+        fi.length &&
+        !(expanded && fi.map((i) => i.instrument_id).includes(expanded))
+      ) {
+        setExpanded(fi[0].instrument_id);
+      }
+    },
+    [expanded, setExpanded]
+  );
 
   const syncFileInfos = useCallback(() => {
     console.log("syncing fileinfo");
@@ -222,18 +236,18 @@ export default function Upload({
     const after = fileInfos.findIndex(
       (f) => f.instrument_id === after_instrument_id
     );
+    const instrument_id = "ManuallyCreated" + String(new Date().getTime());
     const newFileInfos = fileInfos
       .slice(0, after + 1)
       .concat([
         {
-          instrument_id: String(new Date().getTime()),
+          instrument_id: instrument_id,
           instrument_name: "",
           questions: [{ question_no: "", question_text: "" }],
         },
       ])
       .concat(fileInfos.slice(after + 1));
-    console.log(newFileInfos);
-    setFileInfos(newFileInfos);
+    setFileInfos(newFileInfos, instrument_id);
     syncFileInfos();
   };
 
@@ -375,7 +389,7 @@ export default function Upload({
         key={instrument_id}
         expanded={expanded === instrument_id}
         onChange={(e, ex) => {
-          setExpanded(ex ? instrument_id : false);
+          if (ex) setExpanded(instrument_id);
           syncFileInfos();
         }}
       >
@@ -399,6 +413,16 @@ export default function Upload({
           }}
         >
           <TextField
+            error={
+              fi.questions.reduce((a, q) => (a = a + q.question_text), "")
+                .length === 0
+            }
+            helperText={
+              fi.questions.reduce((a, q) => (a = a + q.question_text), "")
+                .length === 0
+                ? "You must add questions before this will be harmonised"
+                : false
+            }
             variant="standard"
             sx={{
               pointerEvents: "auto",
@@ -500,7 +524,17 @@ export default function Upload({
         setState={setMatchError}
       />
 
-      <DragDrop filesReceiver={filesReceiver} sx={{ margin: "2rem" }} />
+      <DragDrop filesReceiver={filesReceiver} sx={{ mt: "2rem" }} />
+      {currentUser &&
+        currentUser.providerData &&
+        currentUser.providerData
+          .map((p) => p.providerId)
+          .includes("google.com") && (
+          <GoogleDriveImport
+            filesReceiver={filesReceiver}
+            sx={{ display: "flex", width: "100%", mt: "1rem" }}
+          />
+        )}
       <Stack
         direction={"row"}
         spacing={1}
