@@ -1,7 +1,15 @@
-import React, { useState, useRef, memo, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  memo,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react";
 import DragDrop from "./DragDrop";
 import GoogleDriveImport from "./GoogleDriveImport";
 import { useData } from "../contexts/DataContext";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Accordion,
@@ -43,12 +51,15 @@ export default function Upload({
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
+  const [importFeedback, setImportFeedback] = useState();
   const [grouping] = useState("");
   const [expanded, setExpanded] = useState(false);
   const dirty = useRef(false);
   const localFileInfos = useRef();
   const history = useHistory();
-  const { match, parse } = useData();
+  const { match, parse, getSharedInstrument } = useData();
+  const { importId } = useParams();
+
   ReactGA.send({
     hitType: "pageview",
     page: "/",
@@ -75,6 +86,40 @@ export default function Upload({
     },
     [expanded, setExpanded]
   );
+
+  useEffect(() => {
+    const isValidImport = (inst) => {
+      const isQuestionValid = (q) => {
+        return !!q.question_text;
+      };
+      return (
+        !!inst.instrument_name &&
+        !!inst.questions &&
+        Array.isArray(inst.questions) &&
+        inst.questions.every((q) => isQuestionValid(q))
+      );
+    };
+    if (importId) {
+      getSharedInstrument(importId)
+        .then((imported) => {
+          if (!Array.isArray(imported)) imported = [imported];
+          if (imported.every((inst) => isValidImport(inst))) {
+            imported.map((i) => {
+              i.instrument_id = "Imported" + String(new Date().getTime());
+            });
+            console.log("imported", imported);
+            setFileInfos(imported);
+            syncFileInfos();
+            setImportFeedback(
+              "Your imported instruments have all been added below"
+            );
+          }
+        })
+        .catch((e) => {
+          setImportFeedback("Could not import that - Sorry!");
+        });
+    }
+  }, [importId]);
 
   const syncFileInfos = useCallback(() => {
     console.log("syncing fileinfo");
@@ -522,6 +567,12 @@ export default function Upload({
         severity="error"
         state={matchError}
         setState={setMatchError}
+      />
+      <InlineFeedback
+        message={importFeedback}
+        severity="info"
+        state={!!importFeedback}
+        setState={setImportFeedback}
       />
 
       <DragDrop filesReceiver={filesReceiver} sx={{ mt: "2rem" }} />
