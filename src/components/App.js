@@ -448,7 +448,7 @@ function App() {
                       ReactGA={ReactGA}
                     />
                   </Route>
-                  <Route path="*:/">
+                  <Route path="*">
                     <Upload
                       appFileInfos={fileInfos}
                       setAppFileInfos={setFileInfos}
