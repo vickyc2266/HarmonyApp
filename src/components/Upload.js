@@ -39,6 +39,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import pdfTableExtractor from "../utilities/pdf-table-extractor";
 import { useAuth } from "../contexts/AuthContext";
+import { Base64 } from "js-base64";
 
 export default function Upload({
   appFileInfos,
@@ -72,7 +73,7 @@ export default function Upload({
 
   const setFileInfos = useCallback(
     (fi, forceExpanded) => {
-      console.log("setting local FI " + JSON.stringify(fi));
+      console.log("setting local FI ", fi);
       dirty.current = dirty.current + 1;
       localFileInfos.current = fi;
       if (forceExpanded) {
@@ -86,46 +87,79 @@ export default function Upload({
     },
     [expanded, setExpanded]
   );
-
-  useEffect(() => {
-    const isValidImport = (inst) => {
-      const isQuestionValid = (q) => {
-        return !!q.question_text;
-      };
-      return (
-        !!inst.instrument_name &&
-        !!inst.questions &&
-        Array.isArray(inst.questions) &&
-        inst.questions.every((q) => isQuestionValid(q))
-      );
-    };
-    if (importId) {
-      getSharedInstrument(importId)
-        .then((imported) => {
-          if (!Array.isArray(imported)) imported = [imported];
-          if (imported.every((inst) => isValidImport(inst))) {
-            imported.map((i) => {
-              i.instrument_id = "Imported" + String(new Date().getTime());
-            });
-            console.log("imported", imported);
-            setFileInfos(imported);
-            syncFileInfos();
-            setImportFeedback(
-              "Your imported instruments have all been added below"
-            );
-          }
-        })
-        .catch((e) => {
-          setImportFeedback("Could not import that - Sorry!");
-        });
-    }
-  }, [importId]);
-
   const syncFileInfos = useCallback(() => {
     console.log("syncing fileinfo");
     setAppFileInfos(localFileInfos.current);
     dirty.current = false;
   }, [setAppFileInfos]);
+
+  useEffect(() => {
+    if (importId) {
+      // immediately rewite URL to prevent reimport loop trauma
+      history.push("/");
+
+      // define validation functions
+      const importToModelDef = (imported) => {
+        const isValidImport = (inst) => {
+          const isQuestionValid = (q) => {
+            return !!q.question_text;
+          };
+          return (
+            !!inst.instrument_name &&
+            !!inst.questions &&
+            Array.isArray(inst.questions) &&
+            inst.questions.every((q) => isQuestionValid(q))
+          );
+        };
+        // make it an array if just a single instrument
+        if (!Array.isArray(imported)) imported = [imported];
+
+        // if valid import - adding to the existing fileinfos - App contains a beforeunload to stash file infors between loads within session.
+        if (imported.every((inst) => isValidImport(inst))) {
+          imported.map(
+            (i) => (i.instrument_id = "Imported" + String(new Date().getTime()))
+          );
+          setFileInfos([...fileInfos].concat(imported));
+          syncFileInfos();
+          return imported.length;
+        } else {
+          return 0;
+        }
+      };
+      toast.promise(
+        new Promise((resolve, reject) => {
+          if (importId.length > 20 && Base64.isValid(importId)) {
+            // Support the whole instrument being presented as a base64 encoded instrument object - This will only work for small instruments but enhances privacy and speed
+            try {
+              let imported = JSON.parse(Base64.decode(importId));
+              const nImported = importToModelDef(imported);
+              if (nImported) {
+                setTimeout(() => resolve(nImported), 250);
+              } else {
+                setTimeout(() => reject(0), 250);
+              }
+            } catch (e) {
+              setTimeout(() => reject(e), 250);
+            }
+          } else {
+            getSharedInstrument(importId).then((imported) => {
+              const nImported = importToModelDef(imported);
+              if (nImported) {
+                resolve(nImported);
+              } else {
+                reject(0);
+              }
+            });
+          }
+        }),
+        {
+          pending: "Importing your instruments",
+          success: "All your instruments have been imported",
+          error: "Sorry we couldn't interpret that import!",
+        }
+      );
+    }
+  });
 
   function filesReceiver(fileList) {
     const files = Array.from(fileList);

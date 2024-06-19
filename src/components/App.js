@@ -55,6 +55,22 @@ function App() {
   }, [prefersDarkMode]);
 
   useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      // stash the current fileInfos to sessionStorage so they can be retreived in the case of handling an import link
+      sessionStorage["harmonyStashed"] = JSON.stringify(fileInfos);
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [fileInfos]);
+
+  useEffect(() => {
+    if (sessionStorage["harmonyStashed"])
+      setFileInfos(JSON.parse(sessionStorage["harmonyStashed"]));
+  }, []);
+
+  useEffect(() => {
     //default to intraInstrument ON in the case of just one instument in the model
     if (
       fileInfos &&
