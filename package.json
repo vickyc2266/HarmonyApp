@@ -36,13 +36,15 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "webpack-cli": "^5.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:HarmonyExport": "webpack --config webpack.config.component.js"
   },
   "eslintConfig": {
     "extends": "react-app"
