@@ -27,6 +27,16 @@ def api(req: https_fn.Request) -> https_fn.Response:
                 d = doc.to_dict()
                 d["fbid"] = doc.id
                 data.append(d)
+        case "/shares":
+            match req.method:
+                case "POST":
+                    payload = req.json
+                    update_time, share_ref = db.collection("imports").add(payload)
+                    return https_fn.Response(json.dumps({"share_id": share_ref}), mimetype="application/json")
+                case "GET":
+                    share_id = req.args.get('id')
+                    doc = db.collection("imports").document(share_id).get()
+                    return https_fn.Response(json.dumps(doc), mimetype="application/json")
         case "/harmonisations":
             docs = db.collection("harmonisations").stream()
             for doc in docs:

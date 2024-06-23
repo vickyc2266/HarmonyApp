@@ -110,14 +110,28 @@ export function DataProvider({ children }) {
   const getVersion = () => {
     return retryableGetData({
       url: process.env.REACT_APP_API_VERSION,
-      timeout: 800,
+      timeout: 1500,
     }).then((data) => data.harmony_version || "unknown");
   };
   const getModels = () => {
     return retryableGetData({
       url: process.env.REACT_APP_API_MODELS,
-      timeout: 800,
+      timeout: 1500,
     });
+  };
+
+  const getSharedInstrument = async (docID) => {
+    if (docID) {
+      const docRef = doc(db, "imports", docID);
+      const h = await getDoc(docRef);
+      if (h.exists()) {
+        updateDoc(docRef, {
+          accessed: serverTimestamp(),
+        });
+        return h.data();
+      } else
+        return Promise.reject(Error(`No such shared instrument: .${docID}`));
+    }
   };
 
   const getPublicHarmonisations = async (docID) => {
@@ -253,6 +267,7 @@ export function DataProvider({ children }) {
         storeHarmonisation,
         getMyHarmonisations,
         getPublicHarmonisations,
+        getSharedInstrument,
         reportMisMatch,
         prepForFireStore,
         reportRating,
