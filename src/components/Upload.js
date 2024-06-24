@@ -1,6 +1,15 @@
-import React, { useState, useRef, memo, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  memo,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react";
 import DragDrop from "./DragDrop";
-import postData from "../utilities/postData";
+import GoogleDriveImport from "./GoogleDriveImport";
+import { useData } from "../contexts/DataContext";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Accordion,
@@ -29,6 +38,8 @@ import { simplifyApi } from "../utilities/simplifyApi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import pdfTableExtractor from "../utilities/pdf-table-extractor";
+import { useAuth } from "../contexts/AuthContext";
+import { Base64 } from "js-base64";
 
 export default function Upload({
   appFileInfos,
@@ -37,14 +48,19 @@ export default function Upload({
   existingInstruments,
   ReactGA,
 }) {
+  const { currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [parseError, setParseError] = useState(false);
   const [matchError, setMatchError] = useState(false);
+  const [importFeedback, setImportFeedback] = useState();
   const [grouping] = useState("");
   const [expanded, setExpanded] = useState(false);
   const dirty = useRef(false);
   const localFileInfos = useRef();
   const history = useHistory();
+  const { match, parse, getSharedInstrument } = useData();
+  const { importId } = useParams();
+
   ReactGA.send({
     hitType: "pageview",
     page: "/",
@@ -55,17 +71,95 @@ export default function Upload({
     return dirty.current ? localFileInfos.current || [] : appFileInfos || [];
   }, [appFileInfos]);
 
-  const setFileInfos = useCallback((fi) => {
-    console.log("setting local FI " + JSON.stringify(fi));
-    dirty.current = dirty.current + 1;
-    localFileInfos.current = fi;
-  }, []);
-
+  const setFileInfos = useCallback(
+    (fi, forceExpanded) => {
+      console.log("setting local FI ", fi);
+      dirty.current = dirty.current + 1;
+      localFileInfos.current = fi;
+      if (forceExpanded) {
+        setExpanded(forceExpanded);
+      } else if (
+        fi.length &&
+        !(expanded && fi.map((i) => i.instrument_id).includes(expanded))
+      ) {
+        setExpanded(fi[0].instrument_id);
+      }
+    },
+    [expanded, setExpanded]
+  );
   const syncFileInfos = useCallback(() => {
     console.log("syncing fileinfo");
     setAppFileInfos(localFileInfos.current);
     dirty.current = false;
   }, [setAppFileInfos]);
+
+  useEffect(() => {
+    if (importId) {
+      // immediately rewite URL to prevent reimport loop trauma
+      history.push("/");
+
+      // define validation functions
+      const importToModelDef = (imported) => {
+        const isValidImport = (inst) => {
+          const isQuestionValid = (q) => {
+            return !!q.question_text;
+          };
+          return (
+            !!inst.instrument_name &&
+            !!inst.questions &&
+            Array.isArray(inst.questions) &&
+            inst.questions.every((q) => isQuestionValid(q))
+          );
+        };
+        // make it an array if just a single instrument
+        if (!Array.isArray(imported)) imported = [imported];
+
+        // if valid import - adding to the existing fileinfos - App contains a beforeunload to stash file infors between loads within session.
+        if (imported.every((inst) => isValidImport(inst))) {
+          imported.map(
+            (i) => (i.instrument_id = "Imported" + String(new Date().getTime()))
+          );
+          setFileInfos([...fileInfos].concat(imported));
+          syncFileInfos();
+          return imported.length;
+        } else {
+          return 0;
+        }
+      };
+      toast.promise(
+        new Promise((resolve, reject) => {
+          if (importId.length > 20 && Base64.isValid(importId)) {
+            // Support the whole instrument being presented as a base64 encoded instrument object - This will only work for small instruments but enhances privacy and speed
+            try {
+              let imported = JSON.parse(Base64.decode(importId));
+              const nImported = importToModelDef(imported);
+              if (nImported) {
+                setTimeout(() => resolve(nImported), 250);
+              } else {
+                setTimeout(() => reject(0), 250);
+              }
+            } catch (e) {
+              setTimeout(() => reject(e), 250);
+            }
+          } else {
+            getSharedInstrument(importId).then((imported) => {
+              const nImported = importToModelDef(imported);
+              if (nImported) {
+                resolve(nImported);
+              } else {
+                reject(0);
+              }
+            });
+          }
+        }),
+        {
+          pending: "Importing your instruments",
+          success: "All your instruments have been imported",
+          error: "Sorry we couldn't interpret that import!",
+        }
+      );
+    }
+  });
 
   function filesReceiver(fileList) {
     const files = Array.from(fileList);
@@ -124,7 +218,7 @@ export default function Upload({
       .then((allFiles) => {
         toast.promise(
           new Promise((resolve, reject) => {
-            postData(process.env.REACT_APP_API_PARSE, allFiles, 15000)
+            parse(allFiles)
               .then((data) => {
                 const newFileInfos = [...fileInfos];
                 // Load each returned file / instrument in the data
@@ -221,18 +315,18 @@ export default function Upload({
     const after = fileInfos.findIndex(
       (f) => f.instrument_id === after_instrument_id
     );
+    const instrument_id = "ManuallyCreated" + String(new Date().getTime());
     const newFileInfos = fileInfos
       .slice(0, after + 1)
       .concat([
         {
-          instrument_id: String(new Date().getTime()),
+          instrument_id: instrument_id,
           instrument_name: "",
           questions: [{ question_no: "", question_text: "" }],
         },
       ])
       .concat(fileInfos.slice(after + 1));
-    console.log(newFileInfos);
-    setFileInfos(newFileInfos);
+    setFileInfos(newFileInfos, instrument_id);
     syncFileInfos();
   };
 
@@ -374,7 +468,7 @@ export default function Upload({
         key={instrument_id}
         expanded={expanded === instrument_id}
         onChange={(e, ex) => {
-          setExpanded(ex ? instrument_id : false);
+          if (ex) setExpanded(instrument_id);
           syncFileInfos();
         }}
       >
@@ -398,6 +492,16 @@ export default function Upload({
           }}
         >
           <TextField
+            error={
+              fi.questions.reduce((a, q) => (a = a + q.question_text), "")
+                .length === 0
+            }
+            helperText={
+              fi.questions.reduce((a, q) => (a = a + q.question_text), "")
+                .length === 0
+                ? "You must add questions before this will be harmonised"
+                : false
+            }
             variant="standard"
             sx={{
               pointerEvents: "auto",
@@ -498,8 +602,24 @@ export default function Upload({
         state={matchError}
         setState={setMatchError}
       />
+      <InlineFeedback
+        message={importFeedback}
+        severity="info"
+        state={!!importFeedback}
+        setState={setImportFeedback}
+      />
 
-      <DragDrop filesReceiver={filesReceiver} sx={{ margin: "2rem" }} />
+      <DragDrop filesReceiver={filesReceiver} sx={{ mt: "2rem" }} />
+      {currentUser &&
+        currentUser.providerData &&
+        currentUser.providerData
+          .map((p) => p.providerId)
+          .includes("google.com") && (
+          <GoogleDriveImport
+            filesReceiver={filesReceiver}
+            sx={{ display: "flex", width: "100%", mt: "1rem" }}
+          />
+        )}
       <Stack
         direction={"row"}
         spacing={1}
@@ -544,11 +664,7 @@ export default function Upload({
         disabled={!fileInfos || fileInfos.length === 0 || loading}
         onClick={() => {
           setLoading(true);
-          postData(
-            process.env.REACT_APP_API_MATCH,
-            { instruments: fileInfos },
-            30000
-          )
+          match(fileInfos)
             .then((data) => {
               let simpleApi = simplifyApi(data, fileInfos);
               setApiData(simpleApi);

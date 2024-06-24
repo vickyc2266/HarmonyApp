@@ -37,10 +37,12 @@ export default function ResultsOptions({
   }, [resultsOptions]);
 
   useMemo(() => {
-    let thisOptions = { ...resultsOptions };
-    thisOptions.searchTerm = debouncedSearchTerm;
-    setResultsOptions(thisOptions);
-  }, [debouncedSearchTerm]);
+    if (debouncedSearchTerm !== resultsOptions.searchTerm) {
+      let thisOptions = { ...resultsOptions };
+      thisOptions.searchTerm = debouncedSearchTerm;
+      setResultsOptions(thisOptions);
+    }
+  }, [debouncedSearchTerm, resultsOptions, setResultsOptions]);
 
   return (
     <Card

@@ -2,10 +2,9 @@
 
 name: Build and Deploy Release branch to GH pages
 
-
 # after the next release this should be updated to true
 env:
-  CI: false
+  CI: true
 
 on:
   push:
@@ -27,8 +26,10 @@ jobs:
         with:
           node-version: "18.x"
           cache: "npm"
+      - run: npm install
       - run: npm ci
       - run: npm run build --if-present
+      - run: npm run build:HarmonyExport
       # - run: npm test
       - name: Deploy
         uses: s0/git-publish-subdir-action@develop
