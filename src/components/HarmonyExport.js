@@ -6,10 +6,10 @@ import { Base64 } from "js-base64";
     ? define(factory)
     : ((global =
         typeof globalThis !== "undefined" ? globalThis : global || self),
-      (global.MyDataSharingLib = factory()));
+      (global.HarmonyExport = factory()));
 })(this, function () {
   "use strict";
-  const harmonyURL = "https://harmony-staging.netlify.app/#/";
+  const harmonyURL = "https://harmonydata.ac.uk/app/#/";
 
   const createHarmonyUrl = ({ questions, instrument_name }) => {
     //
@@ -18,10 +18,11 @@ import { Base64 } from "js-base64";
       questions.length &&
       questions.every(
         (q) =>
-          (typeof q === "string" || q instanceof String) &&
-          q.question_text &&
-          (typeof q.question_text === "string" ||
-            q.question_text instanceof String)
+          typeof q === "string" ||
+          q instanceof String ||
+          (q.question_text &&
+            (typeof q.question_text === "string" ||
+              q.question_text instanceof String))
       )
     ) {
       const qArray = questions.map((q, i) => {
@@ -41,10 +42,13 @@ import { Base64 } from "js-base64";
     }
   };
 
-  class HarmonySharingComponent extends HTMLElement {
+  class HarmonyExportComponent extends HTMLElement {
     constructor() {
       super();
-      this.attachShadow({ mode: "open" }); // Create a shadow DOM
+      this._questions = [];
+      this._instrument_name = "Imported Instrument";
+      this._size = "26px";
+      this.attachShadow({ mode: "open" });
       this.shadowRoot.innerHTML = `
               <style>
                  #harmony-link {
@@ -70,15 +74,53 @@ import { Base64 } from "js-base64";
               <a target="${harmonyURL}" id="harmony-link"></a>
           `;
     }
+    get size() {
+      return this._size;
+    }
+    set size(size) {
+      this._size = size;
+    }
+
+    get questions() {
+      return this._questions;
+    }
+    set questions(questions) {
+      this._questions = questions;
+    }
+    get instrument_name() {
+      return this._instrument_name;
+    }
+    set instrument_name(instrument_name) {
+      this._instrument_name = instrument_name;
+    }
 
     connectedCallback() {
-      const questions = JSON.parse(this.getAttribute("question_array"));
-      const instrument_name =
-        JSON.parse(this.getAttribute("instrument_name")) ||
-        "Imported Instrument";
-      const size = this.getAttribute("size") || "26px";
+      let questionsA;
       try {
-        const url = createHarmonyUrl(questions, instrument_name);
+        questionsA = JSON.parse(this.getAttribute("questions"));
+        if (!Array.isArray(questionsA)) {
+          console.log("Could not parse question attibutes");
+          questionsA = null;
+        }
+      } catch (e) {
+        console.log("Could not parse question attibutes");
+      }
+      const instrument_nameA = this.getAttribute("instrument_name");
+      const sizeA = this.getAttribute("size");
+
+      // attributes app
+      const size = sizeA || this._size;
+      const questions = questionsA || this._questions;
+      const instrument_name = instrument_nameA || this._instrument_name;
+
+      try {
+        console.log("WCquestions", questions);
+        console.log("WClabel", instrument_name);
+        const url = createHarmonyUrl({
+          questions: questions,
+          instrument_name: instrument_name,
+        });
+        console.log("WCurl", instrument_name);
         this.shadowRoot.getElementById("harmony-link").href = url;
         this.shadowRoot.getElementById("harmony-link").style.width = size;
         this.shadowRoot.getElementById("harmony-link").style.height = size;
@@ -92,10 +134,13 @@ import { Base64 } from "js-base64";
   }
 
   // Register the custom element
-  customElements.define("harmony-export", HarmonySharingComponent);
+  customElements.define("harmony-export", HarmonyExportComponent);
 
+  window.HarmonyExportComponent = HarmonyExportComponent;
+  window.createHarmonyUrl = createHarmonyUrl;
   // Expose functions in the library object
   return {
     createHarmonyUrl,
+    HarmonyExportComponent,
   };
 });

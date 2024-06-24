@@ -29,6 +29,7 @@ jobs:
       - run: npm install
       - run: npm ci
       - run: npm run build --if-present
+      - run: npm run build:HarmonyExport
       # - run: npm test
       - name: Deploy
         uses: s0/git-publish-subdir-action@develop
