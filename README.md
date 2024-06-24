@@ -87,7 +87,7 @@ npm run build:HarmonyExport
 To use this component on other sites include the package:
 
 ```
-<script src="https://harmonydata.ac.uk/js/harmony-export.js"></script>
+<script src="https://harmonydata.ac.uk/app/js/harmony-export.js"></script>
 ```
 
 You then have two routes to creating an harmony link - the easiest is using the custom web component `<harmony-export>` it provides. This takes care of creating the special link code and provides the harmony icon.
