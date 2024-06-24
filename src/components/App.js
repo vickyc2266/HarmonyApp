@@ -57,7 +57,8 @@ function App() {
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       // stash the current fileInfos to sessionStorage so they can be retreived in the case of handling an import link
-      sessionStorage["harmonyStashed"] = JSON.stringify(fileInfos);
+      if (fileInfos.length)
+        sessionStorage["harmonyStashed"] = JSON.stringify(fileInfos);
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
@@ -66,7 +67,10 @@ function App() {
   }, [fileInfos]);
 
   useEffect(() => {
-    if (sessionStorage["harmonyStashed"])
+    if (
+      sessionStorage["harmonyStashed"] &&
+      sessionStorage["harmonyStashed"] !== "undefined"
+    )
       setFileInfos(JSON.parse(sessionStorage["harmonyStashed"]));
   }, []);
 
