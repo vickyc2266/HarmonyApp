@@ -117,9 +117,7 @@ export default function Upload({
 
         // if valid import - adding to the existing fileinfos - App contains a beforeunload to stash file infors between loads within session.
         if (imported.every((inst) => isValidImport(inst))) {
-          imported.map(
-            (i) => (i.instrument_id = "Imported" + String(new Date().getTime()))
-          );
+          imported.map((i) => (i.instrument_id = "Imported_" + Math.random()));
           setFileInfos([...fileInfos].concat(imported));
           syncFileInfos();
           return imported.length;
