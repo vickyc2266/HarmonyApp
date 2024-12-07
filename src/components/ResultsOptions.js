@@ -11,6 +11,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { ReactComponent as xlsxSVG } from "../img/file-excel-solid.svg";
+import { ReactComponent as pdfSVG } from "../img/pdf.svg";
 import DropdownShareButton from "./DropdownShareButton";
 import SvgIcon from "@mui/material/SvgIcon";
 import { useAuth } from "../contexts/AuthContext";
@@ -176,8 +177,6 @@ export default function ResultsOptions({
             <SvgIcon component={xlsxSVG} inheritViewBox />
             <Typography> Excel Export</Typography>
           </Button>
-
-          {/* second button check */}
           <Button
             variant="contained"
             onClick={() => {
@@ -186,13 +185,12 @@ export default function ResultsOptions({
                   category: "Actions",
                   action: "Export Matches",
                 });
-              downloadExcel();
+              downloadExcel();     {/* update to downloadPDF */}
             }}
           >
-            <SvgIcon component={xlsxSVG} inheritViewBox />
+            <SvgIcon component={pdfSVG} inheritViewBox />
             <Typography> PDF Export</Typography>
           </Button>
-          
         </Stack>
       </Stack>
     </Card>
