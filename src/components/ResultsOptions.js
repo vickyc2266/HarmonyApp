@@ -174,8 +174,25 @@ export default function ResultsOptions({
             }}
           >
             <SvgIcon component={xlsxSVG} inheritViewBox />
-            <Typography> Export</Typography>
+            <Typography> Excel Export</Typography>
           </Button>
+
+          {/* second button check */}
+          <Button
+            variant="contained"
+            onClick={() => {
+              ReactGA &&
+                ReactGA.event({
+                  category: "Actions",
+                  action: "Export Matches",
+                });
+              downloadExcel();
+            }}
+          >
+            <SvgIcon component={xlsxSVG} inheritViewBox />
+            <Typography> PDF Export</Typography>
+          </Button>
+          
         </Stack>
       </Stack>
     </Card>
