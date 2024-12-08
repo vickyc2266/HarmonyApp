@@ -305,6 +305,52 @@ function App() {
     XLSXwriteFile(workbook, "Harmony.xlsx");
   };
 
+
+
+
+  const downloadPDF = async (matches, instruments, options) => {
+    try {
+      const response = await fetch('/api/export/pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          matches,
+          instruments,
+          threshold: options.threshold,
+          selected_matches: options.selectedMatches
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('PDF generation failed');
+      }
+  
+      // Create blob from response and download
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'harmony_report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+  
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      throw error;
+    }
+  };
+
+
+
+
+
+
+
+
   let theme = useMemo(
     () =>
       createTheme(deepmerge(getDesignTokens(mode), getThemedComponents(mode))),
@@ -366,6 +412,7 @@ function App() {
                     makePublicShareLink={makePublicShareLink}
                     saveToMyHarmony={saveToMyHarmony}
                     downloadExcel={downloadExcel}
+                    downloadPDF={downloadPDF}
                     toaster={toast}
                     ReactGA={ReactGA}
                   />

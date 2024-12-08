@@ -179,18 +179,25 @@ export default function ResultsOptions({
           </Button>
           <Button
             variant="contained"
-            onClick={() => {
-              ReactGA &&
-                ReactGA.event({
+            onClick={async () => {
+              try {
+                ReactGA && ReactGA.event({
                   category: "Actions",
-                  action: "Export Matches",
+                  action: "Export PDF",
                 });
-              downloadExcel();     {/* update to downloadPDF */}
+                await downloadPDF(matches, instruments, {
+                  threshold: resultsOptions.threshold,
+                  selectedMatches: selectedMatches
+                });
+              } catch (error) {
+                toaster.error('Failed to generate PDF report');
+              }
             }}
           >
             <SvgIcon component={pdfSVG} inheritViewBox />
             <Typography> PDF Export</Typography>
           </Button>
+
         </Stack>
       </Stack>
     </Card>

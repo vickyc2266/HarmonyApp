@@ -31,7 +31,7 @@
     "react-use-custom-hooks": "^0.3.2",
     "react-youtube": "^10.1.0",
     "typeface-montserrat": "^1.1.13",
-    "xlsx": "^0.18.5"
+    "xlsx": ">=0.18.5"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": ">=7.21.11",
