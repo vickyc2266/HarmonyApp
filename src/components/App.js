@@ -36,7 +36,7 @@ import "react-toastify/dist/ReactToastify.css";
 import YouTube from "react-youtube";
 import "../css/youtube.css";
 import { useHistory } from "react-router-dom";
-import HarmonyPDFExport from './HarmonyPDFExport';
+import { jsPDF } from "jspdf";
 
 function App() {
   const history = useHistory();
