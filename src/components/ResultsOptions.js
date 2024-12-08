@@ -177,26 +177,24 @@ export default function ResultsOptions({
             <SvgIcon component={xlsxSVG} inheritViewBox />
             <Typography> Excel Export</Typography>
           </Button>
+        
           <Button
-            variant="contained"
-            onClick={async () => {
-              try {
-                ReactGA && ReactGA.event({
-                  category: "Actions",
-                  action: "Export PDF",
-                });
-                await downloadPDF(matches, instruments, {
-                  threshold: resultsOptions.threshold,
-                  selectedMatches: selectedMatches
-                });
-              } catch (error) {
-                toaster.error('Failed to generate PDF report');
-              }
-            }}
-          >
-            <SvgIcon component={pdfSVG} inheritViewBox />
-            <Typography> PDF Export</Typography>
-          </Button>
+          variant="contained"
+          onClick={async () => {
+            try {
+              ReactGA && ReactGA.event({
+                category: "Actions",
+                action: "Export PDF",
+              });
+              await downloadPDF(resultsOptions.threshold);
+            } catch (error) {
+              toaster.error('Failed to generate PDF report');
+            }
+          }}
+        >
+          <SvgIcon component={pdfSVG} inheritViewBox />
+          <Typography> PDF Export</Typography>
+        </Button>
 
         </Stack>
       </Stack>

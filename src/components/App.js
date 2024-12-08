@@ -307,44 +307,51 @@ function App() {
 
 
 
-
-  const downloadPDF = async (matches, instruments, options) => {
+  const downloadPDF = async () => {
     try {
-      const response = await fetch('/api/export/pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const formattedMatches = computedMatches.map(match => ({
+        score: match.match,
+        question1: {
+          question_text: getQuestion(match.qi).question_text,
+          instrument_name: getQuestion(match.qi).instrument.name
         },
-        body: JSON.stringify({
-          matches,
-          instruments,
-          threshold: options.threshold,
-          selected_matches: options.selectedMatches
-        })
+        question2: {
+          question_text: getQuestion(match.mqi).question_text,
+          instrument_name: getQuestion(match.mqi).instrument.name
+        }
+      }));
+  
+      const pdfExport = new HarmonyPDFExport();
+      const pdfBlob = await pdfExport.generateReport({
+        matches: formattedMatches,
+        instruments: apiData.instruments,
+        threshold: resultsOptions.threshold[0], 
+        selectedMatches: computedMatches
+          .filter(m => m.selected)
+          .map(m => m.id)
       });
-  
-      if (!response.ok) {
-        throw new Error('PDF generation failed');
-      }
-  
-      // Create blob from response and download
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
+
+      const url = URL.createObjectURL(pdfBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'harmony_report.pdf';
+      link.download = 'harmony_matches.pdf';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
   
+      ReactGA?.event({
+        category: "Actions",
+        action: "Export PDF"
+      });
+  
+      setTimeout(ratingToast, 1000);
+  
     } catch (error) {
-      console.error('Error downloading PDF:', error);
-      throw error;
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF report');
     }
   };
-
-
 
 
 

@@ -1,130 +1,81 @@
-import PDFDocument from 'pdfkit';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { format } from 'date-fns';
 
 export class HarmonyPDFExport {
   constructor() {
-    this.doc = new PDFDocument({
-      margin: 50,
-      size: 'A4'
-    });
+    this.doc = new jsPDF();
   }
 
-  /**
-   * Generate a PDF report of harmonization results
-   * @param {Object} data Harmonization matches and metadata
-   * @returns {Promise<Buffer>} PDF document as a buffer
-   */
   async generateReport(data) {
     const {
       matches,
       instruments,
-      timestamp = new Date(),
       threshold,
       selectedMatches = []
     } = data;
 
-    // Add header
-    this.addHeader();
+    // Header
+    this.doc.setFontSize(24);
+    this.doc.text('Harmony Data Report', 105, 20, { align: 'center' });
     
-    // Add summary section
-    this.addSummary({
+    // Summary section
+    this.addSummarySection({
       totalMatches: matches.length,
       selectedMatches: selectedMatches.length,
       instrumentCount: instruments.length,
-      threshold,
-      timestamp
+      threshold
     });
 
-    // Add instruments overview
-    this.addInstrumentsOverview(instruments);
-
-    // Add matches table
+    // Matches table
     this.addMatchesTable(matches, selectedMatches);
 
-    // Return the PDF as a buffer
-    return new Promise((resolve) => {
-      const chunks = [];
-      this.doc.on('data', chunk => chunks.push(chunk));
-      this.doc.on('end', () => resolve(Buffer.concat(chunks)));
-      this.doc.end();
+    return this.doc.output('blob');
+  }
+
+  addSummarySection(summary) {
+    const summaryData = [
+      ['Generated', format(new Date(), 'PPpp')],
+      ['Total Instruments', summary.instrumentCount],
+      ['Total Matches', summary.totalMatches],
+      ['Selected Matches', summary.selectedMatches],
+      ['Match Threshold', `${summary.threshold}%`]
+    ];
+
+    this.doc.autoTable({
+      startY: 30,
+      head: [],
+      body: summaryData,
+      theme: 'plain',
+      margin: { left: 20 },
+      styles: { fontSize: 12 }
     });
-  }
-
-  addHeader() {
-    this.doc
-      .fontSize(24)
-      .text('Harmony Data Report', { align: 'center' })
-      .moveDown();
-  }
-
-  addSummary({ totalMatches, selectedMatches, instrumentCount, threshold, timestamp }) {
-    this.doc
-      .fontSize(14)
-      .text('Summary', { underline: true })
-      .moveDown(0.5)
-      .fontSize(12)
-      .text(`Generated: ${format(timestamp, 'PPpp')}`)
-      .text(`Total Instruments: ${instrumentCount}`)
-      .text(`Total Matches: ${totalMatches}`)
-      .text(`Selected Matches: ${selectedMatches}`)
-      .text(`Match Threshold: ${threshold}%`)
-      .moveDown();
-  }
-
-  addInstrumentsOverview(instruments) {
-    this.doc
-      .fontSize(14)
-      .text('Instruments', { underline: true })
-      .moveDown(0.5)
-      .fontSize(12);
-
-    instruments.forEach(instrument => {
-      this.doc
-        .text(`${instrument.name}:`, { continued: true })
-        .text(` ${instrument.questionCount} questions`)
-        .moveDown(0.5);
-    });
-    
-    this.doc.moveDown();
   }
 
   addMatchesTable(matches, selectedMatches) {
-    this.doc
-      .fontSize(14)
-      .text('Matches', { underline: true })
-      .moveDown(0.5);
+    const tableData = matches.map(match => [
+      match.question1.question_text,
+      match.question1.instrument_name,
+      match.question2.question_text,
+      match.question2.instrument_name,
+      `${(match.score * 100).toFixed(1)}%`
+    ]);
 
-    // Table headers
-    const startX = this.doc.x;
-    const startY = this.doc.y;
-    let currentY = startY;
-
-    this.doc.fontSize(10);
-
-    matches.forEach((match, index) => {
-      // Check if we need a new page
-      if (currentY > 700) {
-        this.doc.addPage();
-        currentY = 50;
+    this.doc.autoTable({
+      startY: this.doc.autoTable.previous.finalY + 20,
+      head: [['Question 1', 'Instrument 1', 'Question 2', 'Instrument 2', 'Score']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { 
+        fillColor: [33, 69, 237],
+        textColor: 255,
+        fontSize: 12
+      },
+      styles: { 
+        overflow: 'linebreak',
+        cellWidth: 'wrap',
+        fontSize: 10
       }
-
-      const isSelected = selectedMatches.includes(match.id);
-      
-      // Draw match row
-      this.doc
-        .fillColor(isSelected ? '#666666' : '#000000')
-        .text(`Match ${index + 1}`, startX, currentY)
-        .text(`${match.score.toFixed(2)}%`, startX + 350, currentY)
-        .moveDown(0.5);
-
-      // Question details
-      this.doc
-        .text(`Question 1: ${match.question1}`, { indent: 20 })
-        .text(`Question 2: ${match.question2}`, { indent: 20 })
-        .text(`Instruments: ${match.instrument1} ↔ ${match.instrument2}`, { indent: 20 })
-        .moveDown();
-
-      currentY = this.doc.y;
     });
   }
 }
