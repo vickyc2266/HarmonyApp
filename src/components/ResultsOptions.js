@@ -191,7 +191,6 @@ export default function ResultsOptions({
                   });
                 await downloadPDF(resultsOptions.threshold); 
               } catch (error) {
-                console.error('PDF Export Failed:', error); 
                 toaster.error('Failed to generate PDF report');
               }
             }}
