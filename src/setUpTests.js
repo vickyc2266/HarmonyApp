@@ -1,10 +1,18 @@
 import '@testing-library/jest-dom';
 import 'text-encoding-utf-8';
+import { TextDecoder, TextEncoder } from 'util';
 
-// Mock fetch
+
+if (!global.TextDecoder) {
+global.TextDecoder = TextDecoder;
+}
+
+if (!global.TextEncoder) {
+global.TextEncoder = TextEncoder;
+}
+
 global.fetch = jest.fn();
 
-// Mock Firebase
 jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(),
   GithubAuthProvider: jest.fn(() => {}),
@@ -15,8 +23,7 @@ jest.mock('firebase/auth', () => ({
   onAuthStateChanged: jest.fn(),
 }));
 
-// Mock AuthContext
-jest.mock('../contexts/AuthContext', () => ({
+jest.mock('./contexts/AuthContext', () => ({
   AuthContext: {
     Consumer: jest.fn(),
     Provider: jest.fn(),
@@ -30,7 +37,6 @@ jest.mock('../contexts/AuthContext', () => ({
   }),
 }));
 
-// Setup ResizeObserver mock
 global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}

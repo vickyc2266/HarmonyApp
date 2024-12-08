@@ -36,6 +36,7 @@ import "react-toastify/dist/ReactToastify.css";
 import YouTube from "react-youtube";
 import "../css/youtube.css";
 import { useHistory } from "react-router-dom";
+import HarmonyPDFExport from './HarmonyPDFExport';
 
 function App() {
   const history = useHistory();
@@ -309,49 +310,51 @@ function App() {
 
   const downloadPDF = async () => {
     try {
-      const formattedMatches = computedMatches.map(match => ({
-        score: match.match,
-        question1: {
-          question_text: getQuestion(match.qi).question_text,
-          instrument_name: getQuestion(match.qi).instrument.name
-        },
-        question2: {
-          question_text: getQuestion(match.mqi).question_text,
-          instrument_name: getQuestion(match.mqi).instrument.name
-        }
-      }));
-  
-      const pdfExport = new HarmonyPDFExport();
-      const pdfBlob = await pdfExport.generateReport({
-        matches: formattedMatches,
-        instruments: apiData.instruments,
-        threshold: resultsOptions.threshold[0], 
-        selectedMatches: computedMatches
-          .filter(m => m.selected)
-          .map(m => m.id)
-      });
+        const formattedMatches = computedMatches.map(match => ({
+            score: match.match,
+            question1: {
+                question_text: getQuestion(match.qi).question_text,
+                instrument_name: getQuestion(match.qi).instrument.name
+            },
+            question2: {
+                question_text: getQuestion(match.mqi).question_text,
+                instrument_name: getQuestion(match.mqi).instrument.name
+            }
+        }));
+    
+        const pdfExport = new HarmonyPDFExport();
+        const pdfBlob = await pdfExport.generateReport({
+            matches: formattedMatches,
+            instruments: apiData.instruments,
+            threshold: resultsOptions.threshold[0], 
+            selectedMatches: computedMatches
+                .filter(m => m.selected)
+                .map(m => m.id)
+        });
 
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'harmony_matches.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-  
-      ReactGA?.event({
-        category: "Actions",
-        action: "Export PDF"
-      });
-  
-      setTimeout(ratingToast, 1000);
-  
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'harmony_matches.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        ReactGA?.event({
+            category: "Actions",
+            action: "Export PDF"
+        });
+
+        setTimeout(ratingToast, 1000);
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Failed to generate PDF report');
+        console.error('Error generating PDF:', error);
+        toast.error('Failed to generate PDF report');
     }
   };
+
+
+  
 
 
 

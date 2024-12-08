@@ -1,8 +1,8 @@
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ResultsOptions from './ResultsOptions';
 
-// Mock dependencies
+
 jest.mock('react-ga4', () => ({
   event: jest.fn(),
 }));
@@ -18,9 +18,9 @@ describe('PDF Export', () => {
     makePublicShareLink: jest.fn(),
     saveToMyHarmony: jest.fn(),
     downloadExcel: jest.fn(),
-    downloadPDF: jest.fn(),
+    downloadPDF: jest.fn().mockResolvedValue(),
     ReactGA: { event: jest.fn() },
-    toaster: { error: jest.fn() }
+    toaster: { error: jest.fn() },
   };
 
   beforeEach(() => {
@@ -34,19 +34,29 @@ describe('PDF Export', () => {
 
   it('calls downloadPDF when clicking export button', async () => {
     render(<ResultsOptions {...mockProps} />);
+    
     const exportButton = screen.getByText('PDF Export');
     fireEvent.click(exportButton);
-    expect(mockProps.downloadPDF).toHaveBeenCalled();
+    
+    await waitFor(() => {
+      expect(mockProps.downloadPDF).toHaveBeenCalled();
+    });
   });
 
   it('shows error toast when PDF export fails', async () => {
     const errorProps = {
       ...mockProps,
-      downloadPDF: jest.fn().mockRejectedValue(new Error('Export failed'))
+      downloadPDF: jest.fn().mockRejectedValue(new Error('Export failed')),
+      toaster: { error: jest.fn() }
     };
+
     render(<ResultsOptions {...errorProps} />);
+    
     const exportButton = screen.getByText('PDF Export');
     fireEvent.click(exportButton);
-    expect(mockProps.toaster.error).toHaveBeenCalledWith('Failed to generate PDF report');
+
+    await waitFor(() => {
+      expect(errorProps.toaster.error).toHaveBeenCalledWith('Failed to generate PDF report');
+    });
   });
 });

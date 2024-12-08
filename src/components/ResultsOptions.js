@@ -24,6 +24,7 @@ export default function ResultsOptions({
   makePublicShareLink,
   saveToMyHarmony,
   downloadExcel,
+  downloadPDF,
   ReactGA,
   toaster,
 }) {
@@ -177,24 +178,34 @@ export default function ResultsOptions({
             <SvgIcon component={xlsxSVG} inheritViewBox />
             <Typography> Excel Export</Typography>
           </Button>
-        
+
           <Button
-          variant="contained"
-          onClick={async () => {
-            try {
-              ReactGA && ReactGA.event({
-                category: "Actions",
-                action: "Export PDF",
-              });
-              await downloadPDF(resultsOptions.threshold);
-            } catch (error) {
-              toaster.error('Failed to generate PDF report');
-            }
-          }}
-        >
-          <SvgIcon component={pdfSVG} inheritViewBox />
-          <Typography> PDF Export</Typography>
-        </Button>
+            variant="contained"
+            onClick={async () => {
+              console.log('PDF Export Button Clicked'); 
+              try {
+                ReactGA &&
+                  ReactGA.event({
+                    category: "Actions",
+                    action: "Export PDF",
+                  });
+                await downloadPDF(resultsOptions.threshold); 
+              } catch (error) {
+                console.error('PDF Export Failed:', error); 
+                toaster.error('Failed to generate PDF report');
+              }
+            }}
+          >
+            <SvgIcon component={pdfSVG} inheritViewBox />
+            <Typography>PDF Export</Typography>
+          </Button>
+
+
+
+
+        
+          
+         
 
         </Stack>
       </Stack>
