@@ -317,6 +317,7 @@ function App() {
         doc.setFontSize(24);
         doc.text('Harmony Data Report', 105, 20, { align: 'center' });
 
+        // Prepare summary data for the first table
         const summaryData = [
             ['Total Instruments', apiData.instruments.length],
             ['Total Matches', computedMatches.length],
@@ -324,6 +325,7 @@ function App() {
             ['Match Threshold', `${resultsOptions.threshold[0]}%`]
         ];
 
+        // Add summary table to the PDF
         doc.autoTable({
             startY: 30,
             body: summaryData,
@@ -332,6 +334,7 @@ function App() {
             styles: { fontSize: 12 }
         });
 
+        // Prepare detailed match data for the second table
         const matchesTableData = computedMatches.map(match => {
             const q1 = getQuestion(match.qi);
             const q2 = getQuestion(match.mqi);
@@ -344,6 +347,7 @@ function App() {
             ];
         });
 
+        // Add matches table to the PDF
         doc.autoTable({
             startY: doc.autoTable.previous.finalY + 10,
             head: [['Question 1', 'Instrument 1', 'Question 2', 'Instrument 2', 'Score']],
