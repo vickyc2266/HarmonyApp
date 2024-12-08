@@ -309,44 +309,57 @@ function App() {
 
 
   const downloadPDF = async () => {
+    setTimeout(ratingToast, 1000);
+
     try {
-        const formattedMatches = computedMatches.map(match => ({
-            score: match.match,
-            question1: {
-                question_text: getQuestion(match.qi).question_text,
-                instrument_name: getQuestion(match.qi).instrument.name
-            },
-            question2: {
-                question_text: getQuestion(match.mqi).question_text,
-                instrument_name: getQuestion(match.mqi).instrument.name
-            }
-        }));
-    
-        const pdfExport = new HarmonyPDFExport();
-        const pdfBlob = await pdfExport.generateReport({
-            matches: formattedMatches,
-            instruments: apiData.instruments,
-            threshold: resultsOptions.threshold[0], 
-            selectedMatches: computedMatches
-                .filter(m => m.selected)
-                .map(m => m.id)
+        const doc = new jsPDF();
+        
+        doc.setFontSize(24);
+        doc.text('Harmony Data Report', 105, 20, { align: 'center' });
+
+        const summaryData = [
+            ['Total Instruments', apiData.instruments.length],
+            ['Total Matches', computedMatches.length],
+            ['Selected Matches', computedMatches.filter(m => m.selected).length],
+            ['Match Threshold', `${resultsOptions.threshold[0]}%`]
+        ];
+
+        doc.autoTable({
+            startY: 30,
+            body: summaryData,
+            theme: 'plain',
+            margin: { left: 20 },
+            styles: { fontSize: 12 }
         });
 
-        const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'harmony_matches.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const matchesTableData = computedMatches.map(match => {
+            const q1 = getQuestion(match.qi);
+            const q2 = getQuestion(match.mqi);
+            return [
+                q1.question_text,
+                q1.instrument.name,
+                q2.question_text,
+                q2.instrument.name,
+                `${(match.match * 100).toFixed(1)}%`
+            ];
+        });
+
+        doc.autoTable({
+            startY: doc.autoTable.previous.finalY + 10,
+            head: [['Question 1', 'Instrument 1', 'Question 2', 'Instrument 2', 'Score']],
+            body: matchesTableData,
+            theme: 'grid',
+            headStyles: { fillColor: [33, 69, 237], textColor: 255, fontSize: 12 },
+            styles: { overflow: 'linebreak', cellWidth: 'wrap', fontSize: 10 }
+        });
+
+        doc.save('harmony_matches.pdf');
 
         ReactGA?.event({
             category: "Actions",
             action: "Export PDF"
         });
 
-        setTimeout(ratingToast, 1000);
     } catch (error) {
         console.error('Error generating PDF:', error);
         toast.error('Failed to generate PDF report');
